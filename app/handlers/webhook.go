@@ -25,6 +25,7 @@ func ManageWebhooks() web.HandlerFunc {
 			Title: "Manage Webhooks · Site Settings",
 			Data: web.Map{
 				"webhooks": allWebhooks.Result,
+				"boardId":  c.Tenant().ID,
 			},
 		})
 	}

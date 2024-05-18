@@ -11,6 +11,7 @@ import { Trans } from "@lingui/macro"
 interface NotificationsPanelProps {
   post: Post
   subscribed: boolean
+  boardNumber: number
 }
 
 export const NotificationsPanel = (props: NotificationsPanelProps) => {
@@ -20,7 +21,7 @@ export const NotificationsPanel = (props: NotificationsPanelProps) => {
   const subscribeOrUnsubscribe = async () => {
     const action = subscribed ? actions.unsubscribe : actions.subscribe
 
-    const response = await action(props.post.number)
+    const response = await action(props.boardNumber, props.post.number)
     if (response.ok) {
       setSubscribed(!subscribed)
     }

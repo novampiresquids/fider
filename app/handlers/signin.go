@@ -127,10 +127,14 @@ func CompleteSignInProfile() web.HandlerFunc {
 		}
 
 		user := &entity.User{
-			Name:   action.Name,
-			Email:  result.Email,
-			Tenant: c.Tenant(),
-			Role:   enum.RoleVisitor,
+			Name:  action.Name,
+			Email: result.Email,
+			Membership: []*entity.UserMembership{
+				&entity.UserMembership{
+					Board: c.Tenant(),
+					Role:  enum.RoleVisitor,
+				},
+			},
 		}
 		err = bus.Dispatch(c, &cmd.RegisterUser{User: user})
 		if err != nil {

@@ -48,3 +48,15 @@ type GetTrialingTenantContacts struct {
 	// Output
 	Contacts []*entity.User
 }
+
+type GetTenantById struct {
+	Id int
+
+	// Output
+	Result *entity.Tenant
+}
+
+type GetTenantsByUser struct {
+	// Output
+	Result []*entity.Tenant
+}

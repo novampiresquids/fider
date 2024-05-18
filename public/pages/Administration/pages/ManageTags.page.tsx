@@ -10,6 +10,7 @@ import { VStack } from "@fider/components/layout"
 
 interface ManageTagsPageProps {
   tags: Tag[]
+  boardId: number
 }
 
 interface ManageTagsPageState {
@@ -32,7 +33,7 @@ export default class ManageTagsPage extends AdminBasePage<ManageTagsPageProps, M
   public id = "p-admin-tags"
   public name = "tags"
   public title = "Tags"
-  public subtitle = "Manage your site tags"
+  public subtitle = "Manage your board tags"
 
   constructor(props: ManageTagsPageProps) {
     super(props)
@@ -55,7 +56,7 @@ export default class ManageTagsPage extends AdminBasePage<ManageTagsPageProps, M
   }
 
   private saveNewTag = async (data: TagFormState): Promise<Failure | undefined> => {
-    const result = await actions.createTag(data.name, data.color, data.isPublic)
+    const result = await actions.createTag(this.props.boardId, data.name, data.color, data.isPublic)
     if (result.ok) {
       this.setState({
         isAdding: false,
@@ -81,7 +82,7 @@ export default class ManageTagsPage extends AdminBasePage<ManageTagsPageProps, M
 
   private getTagList(filter: (tag: Tag) => boolean) {
     return this.state.allTags.filter(filter).map((t) => {
-      return <TagListItem key={t.id} tag={t} onTagDeleted={this.handleTagDeleted} onTagEdited={this.handleTagEdited} />
+      return <TagListItem key={t.id} tag={t} onTagDeleted={this.handleTagDeleted} onTagEdited={this.handleTagEdited} boardId={this.props.boardId} />
     })
   }
 

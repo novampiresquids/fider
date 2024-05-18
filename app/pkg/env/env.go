@@ -206,6 +206,10 @@ func IsSingleHostMode() bool {
 	return Config.HostMode == "single"
 }
 
+func IsMultiBoardMode() bool {
+	return Config.HostMode == "multiboard"
+}
+
 var hasLegal *bool
 
 // HasLegal returns true if current instance contains legal documents: privacy.md and terms.md

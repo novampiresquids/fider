@@ -47,7 +47,7 @@ type SaveVerificationKey struct {
 	Request  NewEmailVerification
 }
 
-//NewEmailVerification is used to define an email verification process
+// NewEmailVerification is used to define an email verification process
 type NewEmailVerification interface {
 	GetEmail() string
 	GetName() string

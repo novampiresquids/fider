@@ -11,6 +11,7 @@ import { t, Trans } from "@lingui/macro"
 
 interface CommentInputProps {
   post: Post
+  boardNumber: number
 }
 
 const CACHE_TITLE_KEY = "CommentInput-Comment-"
@@ -36,7 +37,7 @@ export const CommentInput = (props: CommentInputProps) => {
   const submit = async () => {
     clearError()
 
-    const result = await actions.createComment(props.post.number, content, attachments)
+    const result = await actions.createComment(props.boardNumber, props.post.number, content, attachments)
     if (result.ok) {
       cache.session.remove(getCacheKey())
       location.reload()

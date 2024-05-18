@@ -1,6 +1,7 @@
 import { http, Result } from "@fider/services/http"
 import { UserRole, OAuthConfig, ImageUpload, EmailVerificationKind } from "@fider/models"
 
+
 export interface CheckAvailabilityResponse {
   message: string
 }
@@ -31,22 +32,22 @@ export interface UpdateTenantSettingsRequest {
   locale: string
 }
 
-export const updateTenantSettings = async (request: UpdateTenantSettingsRequest): Promise<Result> => {
-  return await http.post("/_api/admin/settings/general", request)
+export const updateTenantSettings = async (request: UpdateTenantSettingsRequest, boardId: number): Promise<Result> => {
+  return await http.post(`/_api/board/${boardId}/admin/settings/general`, request)
 }
 
-export const updateTenantAdvancedSettings = async (customCSS: string): Promise<Result> => {
-  return await http.post("/_api/admin/settings/advanced", { customCSS })
+export const updateTenantAdvancedSettings = async (customCSS: string, boardId: number): Promise<Result> => {
+  return await http.post(`/_api/board/${boardId}/admin/settings/advanced`, { customCSS })
 }
 
-export const updateTenantPrivacy = async (isPrivate: boolean): Promise<Result> => {
-  return await http.post("/_api/admin/settings/privacy", {
+export const updateTenantPrivacy = async (isPrivate: boolean, boardId: number): Promise<Result> => {
+  return await http.post(`/_api/board/${boardId}/admin/settings/privacy`, {
     isPrivate,
   })
 }
 
-export const updateTenantEmailAuthAllowed = async (isEmailAuthAllowed: boolean): Promise<Result> => {
-  return await http.post("/_api/admin/settings/emailauth", {
+export const updateTenantEmailAuthAllowed = async (isEmailAuthAllowed: boolean, boardId: number): Promise<Result> => {
+  return await http.post(`/_api/board/${boardId}/admin/settings/emailauth`, {
     isEmailAuthAllowed,
   })
 }
@@ -69,8 +70,8 @@ export const completeProfile = async (kind: EmailVerificationKind, key: string, 
   })
 }
 
-export const changeUserRole = async (userID: number, role: UserRole): Promise<Result> => {
-  return await http.post(`/_api/admin/roles/${role}/users`, {
+export const changeUserRole = async (userID: number, role: UserRole, boardId: number): Promise<Result> => {
+  return await http.post(`/_api/board/${boardId}/admin/roles/${role}/users`, {
     userID,
   })
 }

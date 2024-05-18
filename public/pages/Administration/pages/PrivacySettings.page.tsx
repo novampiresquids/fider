@@ -11,7 +11,7 @@ export default class PrivacySettingsPage extends AdminBasePage<any, PrivacySetti
   public id = "p-admin-privacy"
   public name = "privacy"
   public title = "Privacy"
-  public subtitle = "Manage your site privacy"
+  public subtitle = "Manage your board privacy"
 
   constructor(props: any) {
     super(props)
@@ -27,7 +27,7 @@ export default class PrivacySettingsPage extends AdminBasePage<any, PrivacySetti
         isPrivate: active,
       }),
       async () => {
-        const response = await actions.updateTenantPrivacy(this.state.isPrivate)
+        const response = await actions.updateTenantPrivacy(this.state.isPrivate, Fider.session.tenant.id)
         if (response.ok) {
           notify.success("Your privacy settings have been saved.")
         }

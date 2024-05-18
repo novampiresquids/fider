@@ -41,6 +41,7 @@ interface ShowPostPageProps {
   tags: Tag[]
   votes: Vote[]
   attachments: string[]
+  boardNumber: number
 }
 
 interface ShowPostPageState {
@@ -73,7 +74,7 @@ export default class ShowPostPage extends React.Component<ShowPostPageProps, Sho
   }
 
   private saveChanges = async () => {
-    const result = await actions.updatePost(this.props.post.number, this.state.newTitle, this.state.newDescription, this.state.attachments)
+    const result = await actions.updatePost(this.props.boardNumber, this.props.post.number, this.state.newTitle, this.state.newDescription, this.state.attachments)
     if (result.ok) {
       location.reload()
     } else {
@@ -112,7 +113,7 @@ export default class ShowPostPage extends React.Component<ShowPostPageProps, Sho
             <div className="p-show-post__header-col">
               <VStack spacing={4}>
                 <HStack>
-                  <VoteCounter post={this.props.post} />
+                  <VoteCounter post={this.props.post} boardNumber={this.props.boardNumber} />
 
                   <div className="flex-grow">
                     {this.state.editMode ? (
@@ -153,12 +154,12 @@ export default class ShowPostPage extends React.Component<ShowPostPageProps, Sho
                     </>
                   )}
                 </VStack>
-                <ShowPostResponse status={this.props.post.status} response={this.props.post.response} />
+                <ShowPostResponse status={this.props.post.status} response={this.props.post.response} boardNumber={this.props.boardNumber} />
               </VStack>
             </div>
 
             <VStack spacing={4} className="p-show-post__action-col">
-              <VotesPanel post={this.props.post} votes={this.props.votes} />
+              <VotesPanel boardNumber={this.props.boardNumber} post={this.props.post} votes={this.props.votes} />
 
               {Fider.session.isAuthenticated && canEditPost(Fider.session.user, this.props.post) && (
                 <VStack>
@@ -188,20 +189,20 @@ export default class ShowPostPage extends React.Component<ShowPostPageProps, Sho
                           <Trans id="action.edit">Edit</Trans>
                         </span>
                       </Button>
-                      {Fider.session.user.isCollaborator && <ResponseForm post={this.props.post} />}
+                      {Fider.session.user.isCollaborator && <ResponseForm post={this.props.post} boardNumber={this.props.boardNumber} />}
                     </VStack>
                   )}
                 </VStack>
               )}
 
-              <TagsPanel post={this.props.post} tags={this.props.tags} />
-              <NotificationsPanel post={this.props.post} subscribed={this.props.subscribed} />
-              <ModerationPanel post={this.props.post} />
+              <TagsPanel post={this.props.post} tags={this.props.tags} boardNumber={this.props.boardNumber} />
+              <NotificationsPanel post={this.props.post} subscribed={this.props.subscribed} boardNumber={this.props.boardNumber} />
+              <ModerationPanel post={this.props.post} boardNumber={this.props.boardNumber} />
               <PoweredByFider slot="show-post" />
             </VStack>
 
             <div className="p-show-post__discussion_col">
-              <DiscussionPanel post={this.props.post} comments={this.props.comments} />
+              <DiscussionPanel post={this.props.post} comments={this.props.comments} boardNumber={this.props.boardNumber} />
             </div>
           </VStack>
         </div>

@@ -23,7 +23,7 @@ func IsAuthorized(roles ...enum.Role) web.MiddlewareFunc {
 		return func(c *web.Context) error {
 			user := c.User()
 			for _, role := range roles {
-				if user.Role == role {
+				if user.Role(c.Tenant()) == role {
 					return next(c)
 				}
 			}

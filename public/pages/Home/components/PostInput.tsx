@@ -9,6 +9,7 @@ import { t, Trans } from "@lingui/macro"
 interface PostInputProps {
   placeholder: string
   onTitleChanged: (title: string) => void
+  boardNumber: number
 }
 
 const CACHE_TITLE_KEY = "PostInput-Title"
@@ -57,11 +58,11 @@ export const PostInput = (props: PostInputProps) => {
 
   const submit = async (event: ButtonClickEvent) => {
     if (title) {
-      const result = await actions.createPost(title, description, attachments)
+      const result = await actions.createPost(props.boardNumber, title, description, attachments)
       if (result.ok) {
         clearError()
         cache.session.remove(CACHE_TITLE_KEY, CACHE_DESCRIPTION_KEY)
-        location.href = `/posts/${result.data.number}/${result.data.slug}`
+        location.href = `board/${props.boardNumber}/posts/${result.data.number}/${result.data.slug}`
         event.preventEnable()
       } else if (result.error) {
         setError(result.error)

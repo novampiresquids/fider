@@ -3,8 +3,6 @@ package actions
 import (
 	"context"
 
-	"github.com/getfider/fider/app"
-
 	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/enum"
 	"github.com/getfider/fider/app/models/query"
@@ -26,17 +24,20 @@ func NewSignInByEmail() *SignInByEmail {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *SignInByEmail) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	tenant := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
-	if tenant.IsEmailAuthAllowed {
-		return true
-	}
+	/*
+		tenant := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+		if tenant.IsEmailAuthAllowed {
+			return true
+		}
+	*/
 	getUser := &query.GetUserByEmail{
 		Email: action.Email,
 	}
 	if err := bus.Dispatch(ctx, getUser); err != nil {
 		return false
 	}
-	return getUser.Result != nil && getUser.Result.IsAdministrator()
+	// return getUser.Result != nil && getUser.Result.IsAdministrator(tenant)
+	return getUser.Result != nil
 }
 
 // Validate if current model is valid
@@ -54,22 +55,22 @@ func (action *SignInByEmail) Validate(ctx context.Context, user *entity.User) *v
 	return result
 }
 
-//GetEmail returns the email being verified
+// GetEmail returns the email being verified
 func (action *SignInByEmail) GetEmail() string {
 	return action.Email
 }
 
-//GetName returns empty for this kind of process
+// GetName returns empty for this kind of process
 func (action *SignInByEmail) GetName() string {
 	return ""
 }
 
-//GetUser returns the current user performing this action
+// GetUser returns the current user performing this action
 func (action *SignInByEmail) GetUser() *entity.User {
 	return nil
 }
 
-//GetKind returns EmailVerificationKindSignIn
+// GetKind returns EmailVerificationKindSignIn
 func (action *SignInByEmail) GetKind() enum.EmailVerificationKind {
 	return enum.EmailVerificationKindSignIn
 }

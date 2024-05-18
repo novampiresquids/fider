@@ -2,6 +2,8 @@ package middlewares
 
 import (
 	"net/http"
+	"regexp"
+	"strconv"
 
 	"github.com/getfider/fider/app/models/enum"
 	"github.com/getfider/fider/app/models/query"
@@ -10,6 +12,7 @@ import (
 	"github.com/getfider/fider/app/pkg/bus"
 	"github.com/getfider/fider/app/pkg/env"
 	"github.com/getfider/fider/app/pkg/errors"
+	"github.com/getfider/fider/app/pkg/log"
 	"github.com/getfider/fider/app/pkg/web"
 )
 
@@ -18,7 +21,10 @@ func Tenant() web.MiddlewareFunc {
 	if env.IsSingleHostMode() {
 		return SingleTenant()
 	}
-	return MultiTenant()
+	return MultiBoard()
+	/*
+		return MultiTenant()
+	*/
 }
 
 // SingleTenant inject default tenant into current context
@@ -33,6 +39,45 @@ func SingleTenant() web.MiddlewareFunc {
 
 			if firstTenant.Result != nil && !firstTenant.Result.IsDisabled() {
 				c.SetTenant(firstTenant.Result)
+			}
+
+			return next(c)
+		}
+	}
+}
+
+// MultiBoard extracts the board number (repurposed tenant ID) and inject it into current context
+func MultiBoard() web.MiddlewareFunc {
+	return func(next web.HandlerFunc) web.HandlerFunc {
+		return func(c *web.Context) error {
+			regex := regexp.MustCompile(`/board/(\d+)`)
+			matches := regex.FindStringSubmatch(c.Request.URL.Path)
+
+			if len(matches) < 2 {
+				return next(c)
+			}
+
+			boardID, err := strconv.Atoi(matches[1])
+			if err != nil {
+				return c.Failure(err)
+			}
+
+			byID := &query.GetTenantById{Id: boardID}
+			err = bus.Dispatch(c, byID)
+			if err != nil && errors.Cause(err) != app.ErrNotFound {
+				return c.Failure(err)
+			}
+
+			if byID.Result != nil && !byID.Result.IsDisabled() {
+				c.SetTenant(byID.Result)
+
+				if byID.Result.CNAME != "" && !c.IsAjax() {
+					baseURL := web.TenantBaseURL(c, byID.Result)
+					if baseURL != c.BaseURL() {
+						link := baseURL + c.Request.URL.RequestURI()
+						c.SetCanonicalURL(link)
+					}
+				}
 			}
 
 			return next(c)
@@ -78,6 +123,7 @@ func RequireTenant() web.MiddlewareFunc {
 				if env.IsSingleHostMode() {
 					return c.Redirect("/signup")
 				}
+				log.Debug(c, "Missing tenant")
 				return c.NotFound()
 			}
 

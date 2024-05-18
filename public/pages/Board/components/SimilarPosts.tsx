@@ -10,6 +10,7 @@ interface SimilarPostsProps {
   title: string
   tags: Tag[]
   user?: CurrentUser
+  boardNumber: number
 }
 
 interface SimilarPostsState {
@@ -49,7 +50,10 @@ export class SimilarPosts extends React.Component<SimilarPostsProps, SimilarPost
 
   private loadSimilarPosts = () => {
     if (this.state.loading) {
-      actions.searchPosts({ query: this.state.title }).then((x) => {
+      actions.searchPosts({
+        query: this.state.title,
+        boardNumber: this.props.boardNumber
+      }).then((x) => {
         if (x.ok) {
           this.setState({ loading: false, posts: x.data })
         }
@@ -67,7 +71,7 @@ export class SimilarPosts extends React.Component<SimilarPostsProps, SimilarPost
         {this.state.loading ? (
           <Loader />
         ) : (
-          <ListPosts posts={this.state.posts} tags={this.props.tags} emptyText={`No similar posts matched '${this.props.title}'.`} />
+          <ListPosts posts={this.state.posts} tags={this.props.tags} emptyText={`No similar posts matched '${this.props.title}'.`} boardNumber={this.props.boardNumber} />
         )}
       </>
     )

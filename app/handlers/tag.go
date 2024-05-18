@@ -20,7 +20,8 @@ func ManageTags() web.HandlerFunc {
 			Page:  "Administration/pages/ManageTags.page",
 			Title: "Manage Tags · Site Settings",
 			Data: web.Map{
-				"tags": getAllTags.Result,
+				"tags":    getAllTags.Result,
+				"boardId": c.Tenant().ID,
 			},
 		})
 	}

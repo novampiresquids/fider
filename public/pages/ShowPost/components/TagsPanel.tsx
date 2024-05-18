@@ -11,6 +11,7 @@ import { HStack, VStack } from "@fider/components/layout"
 import { Trans } from "@lingui/macro"
 
 interface TagsPanelProps {
+  boardNumber: number
   post: Post
   tags: Tag[]
 }
@@ -27,13 +28,13 @@ export const TagsPanel = (props: TagsPanelProps) => {
     let nextAssignedTags: Tag[] = []
 
     if (idx >= 0) {
-      const response = await actions.unassignTag(tag.slug, props.post.number)
+      const response = await actions.unassignTag(props.boardNumber, tag.slug, props.post.number)
       if (response.ok) {
         nextAssignedTags = [...assignedTags]
         nextAssignedTags.splice(idx, 1)
       }
     } else {
-      const response = await actions.assignTag(tag.slug, props.post.number)
+      const response = await actions.assignTag(props.boardNumber, tag.slug, props.post.number)
       if (response.ok) {
         nextAssignedTags = [...assignedTags, tag]
       }

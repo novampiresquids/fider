@@ -45,10 +45,16 @@ func CreateUser() web.HandlerFunc {
 			}
 			if err != nil && errors.Cause(err) == app.ErrNotFound {
 				user = &entity.User{
-					Tenant: c.Tenant(),
-					Name:   action.Name,
-					Email:  action.Email,
-					Role:   enum.RoleVisitor,
+					// Tenant: c.Tenant(),
+					Name:  action.Name,
+					Email: action.Email,
+					// Role:   enum.RoleVisitor,
+					Membership: []*entity.UserMembership{
+						&entity.UserMembership{
+							Board: c.Tenant(),
+							Role:  enum.RoleVisitor,
+						},
+					},
 				}
 				err = bus.Dispatch(c, &cmd.RegisterUser{User: user})
 			}

@@ -9,6 +9,7 @@ import { t, Trans } from "@lingui/macro"
 interface PostSearchProps {
   exclude?: number[]
   onChanged(postNumber: number): void
+  boardNumber: number
 }
 
 export const PostSearch = (props: PostSearchProps) => {
@@ -22,7 +23,7 @@ export const PostSearch = (props: PostSearchProps) => {
     }
 
     const timer = setTimeout(() => {
-      actions.searchPosts({ query, limit: 6 }).then((res) => {
+      actions.searchPosts({ query, limit: 6, boardNumber: props.boardNumber }).then((res) => {
         if (res.ok) {
           const filteredPosts =
             props.exclude && props.exclude.length > 0 ? res.data.filter((i) => props.exclude && props.exclude.indexOf(i.number) === -1) : res.data

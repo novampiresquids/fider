@@ -11,6 +11,7 @@ interface DiscussionPanelProps {
   user?: CurrentUser
   post: Post
   comments: Comment[]
+  boardNumber: number
 }
 
 export const DiscussionPanel = (props: DiscussionPanelProps) => {
@@ -22,9 +23,9 @@ export const DiscussionPanel = (props: DiscussionPanelProps) => {
         </span>
         <VStack spacing={4} className="c-comment-list">
           {props.comments.map((c) => (
-            <ShowComment key={c.id} post={props.post} comment={c} />
+            <ShowComment key={c.id} post={props.post} comment={c} boardNumber={props.boardNumber} />
           ))}
-          <CommentInput post={props.post} />
+          <CommentInput post={props.post} boardNumber={props.boardNumber} />
         </VStack>
         {props.comments.length === 0 && (
           <div className="text-center mt-4">

@@ -10,6 +10,7 @@ import { Trans } from "@lingui/macro"
 interface ShowCommentProps {
   post: Post
   comment: Comment
+  boardNumber: number
 }
 
 export const ShowComment = (props: ShowCommentProps) => {
@@ -36,7 +37,7 @@ export const ShowComment = (props: ShowCommentProps) => {
   }
 
   const saveEdit = async () => {
-    const response = await actions.updateComment(props.post.number, props.comment.id, newContent, attachments)
+    const response = await actions.updateComment(props.boardNumber, props.post.number, props.comment.id, newContent, attachments)
     if (response.ok) {
       location.reload()
     } else {
@@ -49,7 +50,7 @@ export const ShowComment = (props: ShowCommentProps) => {
   }
 
   const deleteComment = async () => {
-    const response = await actions.deleteComment(props.post.number, props.comment.id)
+    const response = await actions.deleteComment(props.boardNumber, props.post.number, props.comment.id)
     if (response.ok) {
       location.reload()
     }

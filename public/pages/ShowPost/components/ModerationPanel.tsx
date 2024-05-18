@@ -8,6 +8,7 @@ import { t, Trans } from "@lingui/macro"
 
 interface ModerationPanelProps {
   post: Post
+  boardNumber: number
 }
 
 export const ModerationPanel = (props: ModerationPanelProps) => {
@@ -20,7 +21,7 @@ export const ModerationPanel = (props: ModerationPanelProps) => {
   const showModal = async () => setShowConfirmation(true)
 
   const handleDelete = async () => {
-    const response = await actions.deletePost(props.post.number, text)
+    const response = await actions.deletePost(props.boardNumber, props.post.number, text)
     if (response.ok) {
       hideModal()
       navigator.goHome()

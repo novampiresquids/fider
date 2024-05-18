@@ -18,7 +18,7 @@ const GeneralSettingsPage = () => {
   const [error, setError] = useState<Failure | undefined>(undefined)
 
   const handleSave = async (e: ButtonClickEvent) => {
-    const result = await actions.updateTenantSettings({ title, cname, welcomeMessage, invitation, logo, locale })
+    const result = await actions.updateTenantSettings({ title, cname, welcomeMessage, invitation, logo, locale }, fider.session.tenant.id)
     if (result.ok) {
       e.preventEnable()
       location.href = `/`
@@ -42,7 +42,7 @@ const GeneralSettingsPage = () => {
   }
 
   return (
-    <AdminPageContainer id="p-admin-general" name="general" title="General" subtitle="Manage your site settings">
+    <AdminPageContainer id="p-admin-general" name="general" title="General" subtitle="Manage your board settings">
       <Form error={error}>
         <Input field="title" label="Title" maxLength={60} value={title} disabled={!fider.session.user.isAdministrator} onChange={setTitle}>
           <p className="text-muted">
@@ -85,7 +85,7 @@ const GeneralSettingsPage = () => {
           </p>
         </ImageUploader>
 
-        {!Fider.isSingleHostMode() && (
+        {false && !Fider.isSingleHostMode() && (
           <Input
             field="cname"
             label="Custom Domain"

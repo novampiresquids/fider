@@ -2,6 +2,7 @@ package actions
 
 import (
 	"context"
+
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/bus"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/getfider/fider/app/pkg/validate"
 )
 
-//CreateTenant is the input model used to create a tenant
+// CreateTenant is the input model used to create a tenant
 type CreateTenant struct {
 	Token           string `json:"token"`
 	Name            string `json:"name"`
@@ -89,27 +90,27 @@ func (action *CreateTenant) Validate(ctx context.Context, user *entity.User) *va
 	return result
 }
 
-//GetEmail returns the email being verified
+// GetEmail returns the email being verified
 func (action *CreateTenant) GetEmail() string {
 	return action.Email
 }
 
-//GetName returns the name of the email owner
+// GetName returns the name of the email owner
 func (action *CreateTenant) GetName() string {
 	return action.Name
 }
 
-//GetUser returns the current user performing this action
+// GetUser returns the current user performing this action
 func (action *CreateTenant) GetUser() *entity.User {
 	return nil
 }
 
-//GetKind returns EmailVerificationKindSignUp
+// GetKind returns EmailVerificationKindSignUp
 func (action *CreateTenant) GetKind() enum.EmailVerificationKind {
 	return enum.EmailVerificationKindSignUp
 }
 
-//UpdateTenantSettings is the input model used to update tenant settings
+// UpdateTenantSettings is the input model used to update tenant settings
 type UpdateTenantSettings struct {
 	Logo           *dto.ImageUpload `json:"logo"`
 	Title          string           `json:"title"`
@@ -127,7 +128,8 @@ func NewUpdateTenantSettings() *UpdateTenantSettings {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *UpdateTenantSettings) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.Role == enum.RoleAdministrator
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.Role(tenant) == enum.RoleAdministrator
 }
 
 // Validate if current model is valid
@@ -175,14 +177,15 @@ func (action *UpdateTenantSettings) Validate(ctx context.Context, user *entity.U
 	return result
 }
 
-//UpdateTenantAdvancedSettings is the input model used to update tenant advanced settings
+// UpdateTenantAdvancedSettings is the input model used to update tenant advanced settings
 type UpdateTenantAdvancedSettings struct {
 	CustomCSS string `json:"customCSS"`
 }
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *UpdateTenantAdvancedSettings) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.Role == enum.RoleAdministrator
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.Role(tenant) == enum.RoleAdministrator
 }
 
 // Validate if current model is valid
@@ -190,14 +193,15 @@ func (action *UpdateTenantAdvancedSettings) Validate(ctx context.Context, user *
 	return validate.Success()
 }
 
-//UpdateTenantPrivacy is the input model used to update tenant privacy settings
+// UpdateTenantPrivacy is the input model used to update tenant privacy settings
 type UpdateTenantPrivacy struct {
 	IsPrivate bool `json:"isPrivate"`
 }
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *UpdateTenantPrivacy) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.Role == enum.RoleAdministrator
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.Role(tenant) == enum.RoleAdministrator
 }
 
 // Validate if current model is valid
@@ -212,7 +216,8 @@ type UpdateTenantEmailAuthAllowed struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *UpdateTenantEmailAuthAllowed) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.Role == enum.RoleAdministrator
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.Role(tenant) == enum.RoleAdministrator
 }
 
 // Validate if current model is valid

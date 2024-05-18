@@ -5,20 +5,21 @@ import IconChatAlt2 from "@fider/assets/images/heroicons-chat-alt-2.svg"
 import { HStack, VStack } from "@fider/components/layout"
 
 interface ListPostsProps {
+  boardNumber: number
   posts?: Post[]
   tags: Tag[]
   emptyText: string
 }
 
-const ListPostItem = (props: { post: Post; user?: CurrentUser; tags: Tag[] }) => {
+const ListPostItem = (props: { boardNumber: number, post: Post; user?: CurrentUser; tags: Tag[] }) => {
   return (
     <HStack center={true}>
       <div className="align-self-start">
-        <VoteCounter post={props.post} />
+        <VoteCounter post={props.post} boardNumber={props.boardNumber} />
       </div>
       <VStack className="w-full" spacing={2}>
         <HStack justify="between">
-          <a className="text-title hover:text-primary-base" href={`/posts/${props.post.number}/${props.post.slug}`}>
+          <a className="text-title hover:text-primary-base" href={`/board/${props.boardNumber}/posts/${props.post.number}/${props.post.slug}`}>
             {props.post.title}
           </a>
           {props.post.commentsCount > 0 && (
@@ -28,7 +29,7 @@ const ListPostItem = (props: { post: Post; user?: CurrentUser; tags: Tag[] }) =>
           )}
         </HStack>
         <Markdown className="text-gray-600" maxLength={300} text={props.post.description} style="plainText" />
-        <ShowPostResponse status={props.post.status} response={props.post.response} />
+        <ShowPostResponse status={props.post.status} response={props.post.response} boardNumber={props.boardNumber} />
         {props.tags.length >= 1 && (
           <HStack className="flex-wrap">
             {props.tags.map((tag) => (
@@ -53,7 +54,7 @@ export const ListPosts = (props: ListPostsProps) => {
   return (
     <VStack spacing={4} divide={true} center={true}>
       {props.posts.map((post) => (
-        <ListPostItem key={post.id} post={post} tags={props.tags.filter((tag) => post.tags.indexOf(tag.slug) >= 0)} />
+        <ListPostItem boardNumber={props.boardNumber} key={post.id} post={post} tags={props.tags.filter((tag) => post.tags.indexOf(tag.slug) >= 0)} />
       ))}
     </VStack>
   )

@@ -2,6 +2,8 @@ package actions
 
 import (
 	"context"
+
+	"github.com/getfider/fider/app"
 	"github.com/getfider/fider/app/models/cmd"
 	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/enum"
@@ -20,8 +22,9 @@ type CreateEditWebhook struct {
 }
 
 // IsAuthorized returns true if current user is authorized to perform this action
-func (action *CreateEditWebhook) IsAuthorized(_ context.Context, user *entity.User) bool {
-	return user != nil && user.IsAdministrator()
+func (action *CreateEditWebhook) IsAuthorized(ctx context.Context, user *entity.User) bool {
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsAdministrator(tenant)
 }
 
 // Validate if current model is valid
@@ -116,8 +119,9 @@ type PreviewWebhook struct {
 }
 
 // IsAuthorized returns true if current user is authorized to perform this action
-func (action *PreviewWebhook) IsAuthorized(_ context.Context, user *entity.User) bool {
-	return user != nil && user.IsAdministrator()
+func (action *PreviewWebhook) IsAuthorized(ctx context.Context, user *entity.User) bool {
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsAdministrator(tenant)
 }
 
 // Validate if current model is valid

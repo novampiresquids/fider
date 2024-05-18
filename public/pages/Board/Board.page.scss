@@ -1,0 +1,31 @@
+@import "~@fider/assets/styles/variables.scss";
+
+#p-home {
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 0;
+  row-gap: spacing(6);
+
+  @include media("lg") {
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: spacing(6);
+    row-gap: 0;
+  }
+
+  .p-home {
+    &__welcome-col {
+      background-color: get("colors.gray.100");
+      padding: spacing(2);
+      border-radius: get("border.radius.medium");
+
+      @include media("lg") {
+        padding: 0;
+        background-color: transparent;
+      }
+    }
+
+    &__posts-col {
+      grid-column: span 2 / span 2;
+    }
+  }
+}

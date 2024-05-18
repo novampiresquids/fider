@@ -1,0 +1,3 @@
+ALTER TABLE attachments DROP CONSTRAINT attachments_tenant_id_fkey;
+ALTER TABLE blobs DROP CONSTRAINT blobs_tenant_id_fkey;
+ALTER TABLE email_verifications DROP CONSTRAINT email_verifications_tenant_id_fkey;

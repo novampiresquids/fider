@@ -4,7 +4,7 @@ import { Button, Loader, Modal } from "@fider/components"
 import { WebhookProperties } from "@fider/pages/Administration/components/webhook/WebhookProperties"
 import React, { useEffect, useState } from "react"
 import { WebhookType } from "@fider/models"
-import { actions, StringObject } from "@fider/services"
+import { actions, Fider, StringObject } from "@fider/services"
 import { HStack, VStack } from "@fider/components/layout"
 import { HoverInfo } from "@fider/components/common/HoverInfo"
 
@@ -100,7 +100,7 @@ export const WebhookTemplateInfoModal = (props: WebhookTemplateInfoProps) => {
   useEffect(() => {
     let mounted = true
     setProperties(undefined)
-    actions.getWebhookHelp(props.type).then((result) => mounted && setProperties(result.ok ? result.data : null))
+    actions.getWebhookHelp(props.type, Fider.session.tenant.id).then((result) => mounted && setProperties(result.ok ? result.data : null))
     return () => {
       mounted = false
     }

@@ -66,7 +66,7 @@ export default class ManageAuthenticationPage extends AdminBasePage<ManageAuthen
         isEmailAuthAllowed: active,
       }),
       async () => {
-        const response = await actions.updateTenantEmailAuthAllowed(this.state.isEmailAuthAllowed)
+        const response = await actions.updateTenantEmailAuthAllowed(this.state.isEmailAuthAllowed, Fider.session.tenant.id)
         if (response.ok) {
           notify.success(`You successfully changed email authentication setting.`)
         } else {

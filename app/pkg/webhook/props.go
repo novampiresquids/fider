@@ -14,7 +14,7 @@ func (p Props) SetUser(user *entity.User, keyPrefix string) Props {
 		p[keyPrefix+"_id"] = user.ID
 		p[keyPrefix+"_name"] = user.Name
 		p[keyPrefix+"_email"] = user.Email
-		p[keyPrefix+"_role"] = user.Role.String()
+		// p[keyPrefix+"_role"] = user.Role.String()
 		p[keyPrefix+"_avatar"] = user.AvatarURL
 	}
 	return p

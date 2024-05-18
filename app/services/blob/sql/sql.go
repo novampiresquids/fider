@@ -3,14 +3,15 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"sort"
 	"time"
 
 	"github.com/getfider/fider/app/models/cmd"
 	"github.com/getfider/fider/app/models/dto"
-	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/dbx"
+	"github.com/getfider/fider/app/pkg/log"
 
 	"github.com/getfider/fider/app"
 
@@ -91,9 +92,11 @@ func getBlobByKey(ctx context.Context, q *query.GetBlobByKey) error {
 		defer trx.MustCommit()
 
 		b := dbBlob{}
-		err = trx.Get(&b, "SELECT file, content_type, size FROM blobs WHERE key = $1 AND (tenant_id = $2 OR ($2 IS NULL AND tenant_id IS NULL))", q.Key, tenantID)
+		err = trx.Get(&b, "SELECT file, content_type, size FROM blobs WHERE key = $1 LIMIT 1", q.Key)
 		if err != nil {
 			if err == app.ErrNotFound {
+				log.Info(ctx, "Could not find blob for "+q.Key)
+				log.Info(ctx, fmt.Sprintf("Tenant %d", tenantID.Int64))
 				return blob.ErrNotFound
 			}
 			return errors.Wrap(err, "failed to get blob with key '%s'", q.Key)
@@ -142,7 +145,7 @@ func storeBlob(ctx context.Context, c *cmd.StoreBlob) error {
 
 func deleteBlob(ctx context.Context, c *cmd.DeleteBlob) error {
 	blob.EnsureAuthorizedPrefix(ctx, c.Key)
-	
+
 	return using(ctx, func(tenantID sql.NullInt64) error {
 		trx, err := dbx.BeginTx(ctx)
 		if err != nil {
@@ -164,10 +167,14 @@ func deleteBlob(ctx context.Context, c *cmd.DeleteBlob) error {
 }
 
 func using(ctx context.Context, handler func(tenantId sql.NullInt64) error) error {
-	var tenantID sql.NullInt64
-	tenant, ok := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
-	if ok {
-		_ = tenantID.Scan(tenant.ID)
-	}
-	return handler(tenantID)
+	/*
+		var tenantID sql.NullInt64
+		tenant, ok := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+		if ok {
+			_ = tenantID.Scan(tenant.ID)
+		}
+		return handler(tenantID)
+	*/
+	// Hack to put all blobs under tenant 0
+	return handler(sql.NullInt64{Int64: 0})
 }

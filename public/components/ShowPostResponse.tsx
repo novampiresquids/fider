@@ -16,7 +16,7 @@ const DuplicateDetails = (props: PostResponseProps): JSX.Element | null => {
   return (
     <div className="content">
       <span>&#8618;</span>{" "}
-      <a className="text-link" href={`/posts/${original.number}/${original.slug}`}>
+      <a className="text-link" href={`/board/${props.boardNumber}/posts/${original.number}/${original.slug}`}>
         {original.title}
       </a>
     </div>
@@ -26,6 +26,7 @@ const DuplicateDetails = (props: PostResponseProps): JSX.Element | null => {
 interface PostResponseProps {
   status: string
   response: PostResponse | null
+  boardNumber: number
 }
 
 const StatusDetails = (props: PostResponseProps): JSX.Element | null => {

@@ -10,6 +10,7 @@ import { Trans } from "@lingui/macro"
 interface VotesPanelProps {
   post: Post
   votes: Vote[]
+  boardNumber: number
 }
 
 export const VotesPanel = (props: VotesPanelProps) => {
@@ -29,7 +30,7 @@ export const VotesPanel = (props: VotesPanelProps) => {
 
   return (
     <VStack>
-      <VotesModal post={props.post} isOpen={isVotesModalOpen} onClose={closeModal} />
+      <VotesModal boardNumber={props.boardNumber}  post={props.post} isOpen={isVotesModalOpen} onClose={closeModal} />
       <span className="text-category">
         <Trans id="label.voters">Voters</Trans>
       </span>

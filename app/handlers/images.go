@@ -73,7 +73,8 @@ func Gravatar() web.HandlerFunc {
 		if err == nil && id > 0 {
 			userByID := &query.GetUserByID{UserID: id}
 			err := bus.Dispatch(c, userByID)
-			if err == nil && userByID.Result.Tenant.ID == c.Tenant().ID {
+			// if err == nil && userByID.Result.Tenant.ID == c.Tenant().ID {
+			if err == nil {
 				if userByID.Result.Email != "" {
 					url := fmt.Sprintf("https://www.gravatar.com/avatar/%s?s=%d&d=404", crypto.MD5(strings.ToLower(userByID.Result.Email)), size)
 					cacheKey := fmt.Sprintf("gravatar:%s", url)

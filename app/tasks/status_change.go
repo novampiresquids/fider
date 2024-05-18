@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 
+	"github.com/getfider/fider/app"
 	"github.com/getfider/fider/app/models/cmd"
 	"github.com/getfider/fider/app/models/dto"
 	"github.com/getfider/fider/app/models/entity"
@@ -15,7 +16,7 @@ import (
 	"github.com/getfider/fider/app/pkg/worker"
 )
 
-//NotifyAboutStatusChange sends a notification (web and email) to subscribers
+// NotifyAboutStatusChange sends a notification (web and email) to subscribers
 func NotifyAboutStatusChange(post *entity.Post, prevStatus enum.PostStatus) worker.Task {
 	return describe("Notify about post status change", func(c *worker.Context) error {
 		//Don't notify if previous status is the same
@@ -29,9 +30,11 @@ func NotifyAboutStatusChange(post *entity.Post, prevStatus enum.PostStatus) work
 			return c.Failure(err)
 		}
 
+		board, _ := c.Value(app.TenantCtxKey).(*entity.Tenant)
+
 		author := c.User()
 		title := fmt.Sprintf("**%s** changed status of **%s** to **%s**", author.Name, post.Title, post.Status.Name())
-		link := fmt.Sprintf("/posts/%d/%s", post.Number, post.Slug)
+		link := fmt.Sprintf("/board/%d/posts/%d/%s", board.ID, post.Number, post.Slug)
 		for _, user := range users {
 			if user.ID != author.ID {
 				err = bus.Dispatch(c, &cmd.AddNewNotification{

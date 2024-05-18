@@ -96,7 +96,9 @@ func listPostVotes(ctx context.Context, q *query.ListPostVotes) error {
 		FROM post_votes pv
 		INNER JOIN users u
 		ON u.id = pv.user_id
-		AND u.tenant_id = pv.tenant_id 
+		LEFT JOIN members m
+		ON u.id = m.user_id
+		AND m.tenant_id = pv.tenant_id 
 		WHERE pv.post_id = $1  
 		AND pv.tenant_id = $2
 		ORDER BY pv.created_at

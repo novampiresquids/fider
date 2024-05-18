@@ -31,6 +31,7 @@ beforeEach(() => {
     votesCount: 5,
     commentsCount: 2,
     tags: [],
+    boardNumber: 3
   }
 })
 
@@ -41,7 +42,7 @@ describe("<VoteCounter />", () => {
 
     const { container } = render(
       <FiderContext.Provider value={fiderMock.authenticated()}>
-        <VoteCounter post={post} />
+        <VoteCounter post={post} boardNumber={1} />
       </FiderContext.Provider>
     )
     const button = container.querySelector("button")
@@ -56,7 +57,7 @@ describe("<VoteCounter />", () => {
     post.votesCount = 2
     const { container } = render(
       <FiderContext.Provider value={fiderMock.authenticated()}>
-        <VoteCounter post={post} />
+        <VoteCounter post={post} boardNumber={1} />
       </FiderContext.Provider>
     )
     const button = container.querySelector("button")
@@ -69,7 +70,7 @@ describe("<VoteCounter />", () => {
     post.status = PostStatus.Completed.value
     const { container } = render(
       <FiderContext.Provider value={fiderMock.authenticated()}>
-        <VoteCounter post={post} />
+        <VoteCounter post={post} boardNumber={1} />
       </FiderContext.Provider>
     )
     const button = container.querySelector("button")
@@ -83,7 +84,7 @@ describe("<VoteCounter />", () => {
 
     const { container } = render(
       <FiderContext.Provider value={fiderMock.notAuthenticated()}>
-        <VoteCounter post={post} />
+        <VoteCounter post={post} boardNumber={1} />
       </FiderContext.Provider>
     )
     const button = container.querySelector("button") || fail("button not found")
@@ -99,7 +100,7 @@ describe("<VoteCounter />", () => {
 
     const { container } = render(
       <FiderContext.Provider value={fiderMock.authenticated()}>
-        <VoteCounter post={post} />
+        <VoteCounter post={post} boardNumber={1} />
       </FiderContext.Provider>
     )
 
@@ -121,7 +122,7 @@ describe("<VoteCounter />", () => {
 
     const { container } = render(
       <FiderContext.Provider value={fiderMock.authenticated()}>
-        <VoteCounter post={post} />
+        <VoteCounter post={post} boardNumber={1} />
       </FiderContext.Provider>
     )
 

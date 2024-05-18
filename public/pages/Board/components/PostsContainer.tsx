@@ -17,6 +17,7 @@ interface PostsContainerProps {
   posts: Post[]
   tags: Tag[]
   countPerStatus: { [key: string]: number }
+  boardNumber: number
 }
 
 interface PostsContainerState {
@@ -26,6 +27,7 @@ interface PostsContainerState {
   tags: string[]
   query: string
   limit?: number
+  boardNumber: number
 }
 
 export class PostsContainer extends React.Component<PostsContainerProps, PostsContainerState> {
@@ -39,6 +41,7 @@ export class PostsContainer extends React.Component<PostsContainerProps, PostsCo
       query: querystring.get("query"),
       tags: querystring.getArray("tags"),
       limit: querystring.getNumber("limit"),
+      boardNumber: this.props.boardNumber
     }
   }
 
@@ -63,7 +66,10 @@ export class PostsContainer extends React.Component<PostsContainerProps, PostsCo
     window.clearTimeout(this.timer)
     this.setState({ posts: reset ? undefined : this.state.posts, loading: true })
     this.timer = window.setTimeout(() => {
-      actions.searchPosts({ query, view, limit, tags }).then((response) => {
+      actions.searchPosts({
+        query, view, limit, tags,
+        boardNumber: this.props.boardNumber
+      }).then((response) => {
         if (response.ok && this.state.loading) {
           this.setState({ loading: false, posts: response.data })
         }
@@ -122,6 +128,7 @@ export class PostsContainer extends React.Component<PostsContainerProps, PostsCo
           </div>
         </div>
         <ListPosts
+          boardNumber={this.state.boardNumber}
           posts={this.state.posts}
           tags={this.props.tags}
           emptyText={t({ id: "home.postscontainer.label.noresults", message: "No results matched your search, try something different." })}

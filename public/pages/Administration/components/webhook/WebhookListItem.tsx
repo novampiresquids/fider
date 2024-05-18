@@ -16,6 +16,7 @@ import { WebhookFailInfo } from "./WebhookFailInfo"
 
 interface WebhookListItemProps {
   webhook: Webhook
+  boardId: number
   editWebhook: (webhook: Webhook) => void
   onWebhookDeleted: (webhook: Webhook) => void
   onWebhookFailed: (webhook: Webhook) => void
@@ -56,7 +57,7 @@ export const WebhookListItem = (props: WebhookListItemProps) => {
   const hideFailInfoModal = () => setIsFailInfoModalOpen(false)
 
   const deleteWebhook = async () => {
-    const result = await actions.deleteWebhook(props.webhook.id)
+    const result = await actions.deleteWebhook(props.webhook.id, props.boardId)
     if (result.ok) {
       setDeleting(false)
       props.onWebhookDeleted(props.webhook)
@@ -64,7 +65,7 @@ export const WebhookListItem = (props: WebhookListItemProps) => {
   }
 
   const testWebhook = async () => {
-    const result = await actions.testWebhook(props.webhook.id)
+    const result = await actions.testWebhook(props.webhook.id, props.boardId)
     setTriggerResult(result.data)
     if (result.ok && result.data.success) {
       notify.success("Successfully triggered webhook")

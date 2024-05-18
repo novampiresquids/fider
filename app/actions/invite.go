@@ -27,7 +27,8 @@ type InviteUsers struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *InviteUsers) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsCollaborator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsCollaborator(tenant)
 }
 
 // Validate if current model is valid
@@ -87,28 +88,28 @@ func (action *InviteUsers) Validate(ctx context.Context, user *entity.User) *val
 	return result
 }
 
-//UserInvitation is the model used to register an invite sent to an user
+// UserInvitation is the model used to register an invite sent to an user
 type UserInvitation struct {
 	Email           string
 	VerificationKey string
 }
 
-//GetEmail returns the invited user's email
+// GetEmail returns the invited user's email
 func (e *UserInvitation) GetEmail() string {
 	return e.Email
 }
 
-//GetName returns empty for this kind of process
+// GetName returns empty for this kind of process
 func (e *UserInvitation) GetName() string {
 	return ""
 }
 
-//GetUser returns the current user performing this action
+// GetUser returns the current user performing this action
 func (e *UserInvitation) GetUser() *entity.User {
 	return nil
 }
 
-//GetKind returns EmailVerificationKindUserInvitation
+// GetKind returns EmailVerificationKindUserInvitation
 func (e *UserInvitation) GetKind() enum.EmailVerificationKind {
 	return enum.EmailVerificationKindUserInvitation
 }

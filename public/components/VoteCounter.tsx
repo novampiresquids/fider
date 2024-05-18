@@ -9,6 +9,7 @@ import FaCaretUp from "@fider/assets/images/fa-caretup.svg"
 
 interface VoteCounterProps {
   post: Post
+  boardNumber: number
 }
 
 export const VoteCounter = (props: VoteCounterProps) => {
@@ -25,7 +26,7 @@ export const VoteCounter = (props: VoteCounterProps) => {
 
     const action = hasVoted ? actions.removeVote : actions.addVote
 
-    const response = await action(props.post.number)
+    const response = await action(props.boardNumber, props.post.number)
     if (response.ok) {
       setVotesCount(votesCount + (hasVoted ? -1 : 1))
       setHasVoted(!hasVoted)

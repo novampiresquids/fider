@@ -43,7 +43,8 @@ func NewCreateEditOAuthConfig() *CreateEditOAuthConfig {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *CreateEditOAuthConfig) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsAdministrator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsAdministrator(tenant)
 }
 
 // Validate if current model is valid

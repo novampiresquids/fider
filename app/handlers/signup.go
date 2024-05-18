@@ -75,8 +75,12 @@ func CreateTenant() web.HandlerFunc {
 		c.SetTenant(createTenant.Result)
 
 		user := &entity.User{
-			Tenant: createTenant.Result,
-			Role:   enum.RoleAdministrator,
+			Membership: []*entity.UserMembership{
+				&entity.UserMembership{
+					Board: createTenant.Result,
+					Role:  enum.RoleAdministrator,
+				},
+			},
 		}
 
 		siteURL := web.TenantBaseURL(c, c.Tenant())
@@ -175,10 +179,14 @@ func VerifySignUpKey() web.HandlerFunc {
 		}
 
 		user := &entity.User{
-			Name:   result.Name,
-			Email:  result.Email,
-			Tenant: c.Tenant(),
-			Role:   enum.RoleAdministrator,
+			Name:  result.Name,
+			Email: result.Email,
+			Membership: []*entity.UserMembership{
+				&entity.UserMembership{
+					Board: c.Tenant(),
+					Role:  enum.RoleAdministrator,
+				},
+			},
 		}
 
 		if err = bus.Dispatch(c, &cmd.RegisterUser{User: user}); err != nil {

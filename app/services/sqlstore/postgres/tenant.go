@@ -5,8 +5,10 @@ import (
 	"time"
 
 	"github.com/getfider/fider/app/pkg/bus"
+	"github.com/getfider/fider/app/pkg/log"
 
 	"github.com/getfider/fider/app/models/cmd"
+	"github.com/getfider/fider/app/models/dto"
 	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/enum"
 	"github.com/getfider/fider/app/models/query"
@@ -183,7 +185,7 @@ func activateTenant(ctx context.Context, c *cmd.ActivateTenant) error {
 }
 
 func getVerificationByKey(ctx context.Context, q *query.GetVerificationByKey) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		verification := dbEmailVerification{}
 
 		query := "SELECT id, email, name, key, created_at, verified_at, expires_at, kind, user_id FROM email_verifications WHERE key = $1 AND kind = $2 LIMIT 1"
@@ -198,14 +200,14 @@ func getVerificationByKey(ctx context.Context, q *query.GetVerificationByKey) er
 }
 
 func saveVerificationKey(ctx context.Context, c *cmd.SaveVerificationKey) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		var userID any
 		if c.Request.GetUser() != nil {
 			userID = c.Request.GetUser().ID
 		}
 
 		query := "INSERT INTO email_verifications (tenant_id, email, created_at, expires_at, key, name, kind, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
-		_, err := trx.Execute(query, tenant.ID, c.Request.GetEmail(), time.Now(), time.Now().Add(c.Duration), c.Key, c.Request.GetName(), c.Request.GetKind(), userID)
+		_, err := trx.Execute(query, 0, c.Request.GetEmail(), time.Now(), time.Now().Add(c.Duration), c.Key, c.Request.GetName(), c.Request.GetKind(), userID)
 		if err != nil {
 			return errors.Wrap(err, "failed to save verification key for kind '%d'", c.Request.GetKind())
 		}
@@ -214,9 +216,9 @@ func saveVerificationKey(ctx context.Context, c *cmd.SaveVerificationKey) error 
 }
 
 func setKeyAsVerified(ctx context.Context, c *cmd.SetKeyAsVerified) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		query := "UPDATE email_verifications SET verified_at = $1 WHERE tenant_id = $2 AND key = $3 AND verified_at IS NULL"
-		_, err := trx.Execute(query, time.Now(), tenant.ID, c.Key)
+		_, err := trx.Execute(query, time.Now(), 0, c.Key)
 		if err != nil {
 			return errors.Wrap(err, "failed to update verified date of email verification request")
 		}
@@ -285,6 +287,51 @@ func getTenantByDomain(ctx context.Context, q *query.GetTenantByDomain) error {
 		`, env.Subdomain(q.Domain), q.Domain, q.Domain)
 		if err != nil {
 			return errors.Wrap(err, "failed to get tenant with domain '%s'", q.Domain)
+		}
+
+		q.Result = tenant.toModel()
+		return nil
+	})
+}
+
+func getTenantsByUser(ctx context.Context, q *query.GetTenantsByUser) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
+		var tenants []*dbTenant
+
+		err := trx.Select(&tenants, `
+			SELECT t.id, t.name, t.subdomain, t.cname, t.invitation, t.locale, t.welcome_message, t.status, t.is_private, t.logo_bkey, t.custom_css, t.is_email_auth_allowed
+			FROM tenants t
+			LEFT JOIN members m
+			ON m.tenant_id = t.id
+			WHERE m.user_id = $1
+			ORDER BY t.id 
+		`, user.ID)
+		if err != nil {
+			return errors.Wrap(err, "failed to get tenants for user '%s'", user.Name)
+		}
+
+		for _, v := range tenants {
+			log.Infof(ctx, "Tenant: @{id}", dto.Props{"id": v.ID})
+			q.Result = append(q.Result, v.toModel())
+			log.Infof(ctx, "Length of q: @{l}", dto.Props{"l": len(q.Result)})
+		}
+		return nil
+	})
+}
+
+func getTenantById(ctx context.Context, q *query.GetTenantById) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, _ *entity.User) error {
+		tenant := dbTenant{}
+
+		err := trx.Get(&tenant, `
+			SELECT 
+				id, name, subdomain, cname, invitation, locale, welcome_message, status, is_private, logo_bkey, custom_css, is_email_auth_allowed
+			FROM tenants
+			WHERE id = $1
+		`, q.Id)
+
+		if err != nil {
+			return errors.Wrap(err, "failed to get first tenant")
 		}
 
 		q.Result = tenant.toModel()

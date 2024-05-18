@@ -2,7 +2,7 @@ import "./WebhookForm.scss"
 
 import React, { useEffect, useState } from "react"
 import { Button, Field, Form, Input, Loader, Message, Select, SelectOption, TextArea, Toggle } from "@fider/components"
-import { actions, Failure } from "@fider/services"
+import { actions, Failure, Fider } from "@fider/services"
 import { HStack, VStack } from "@fider/components/layout"
 import { Webhook, WebhookData, WebhookPreviewResult, WebhookStatus, WebhookType } from "@fider/models"
 import { HoverInfo } from "@fider/components/common/HoverInfo"
@@ -95,7 +95,7 @@ export const WebhookForm = (props: WebhookFormProps) => {
 
   const calculatePreview = () => {
     actions
-      .previewWebhook(type, url, content)
+      .previewWebhook(type, url, content, Fider.session.tenant.id)
       .then(
         (result) => (result.ok ? result.data : null),
         () => null

@@ -70,12 +70,12 @@ func User() web.MiddlewareFunc {
 					}
 					user = getUserByAPIKey.Result
 
-					if !user.IsCollaborator() {
+					if !user.IsCollaborator(c.Tenant()) {
 						return c.HandleValidation(validate.Failed("API Key is invalid"))
 					}
 
 					if impersonateUserIDStr := c.Request.GetHeader("X-Fider-UserID"); impersonateUserIDStr != "" {
-						if !user.IsAdministrator() {
+						if !user.IsAdministrator(c.Tenant()) {
 							return c.HandleValidation(validate.Failed("Only Administrators are allowed to impersonate another user"))
 						}
 						impersonateUserID, err := strconv.Atoi(impersonateUserIDStr)
@@ -95,7 +95,8 @@ func User() web.MiddlewareFunc {
 				}
 			}
 
-			if user != nil && c.Tenant() != nil && user.Tenant.ID == c.Tenant().ID {
+			// if user != nil && c.Tenant() != nil && user.Tenant.ID == c.Tenant().ID {
+			if user != nil {
 				// blocked users are unable to sign in
 				if user.Status == enum.UserBlocked {
 					c.RemoveCookie(web.CookieAuthName)

@@ -84,7 +84,8 @@ func (input *UpdatePost) OnPreExecute(ctx context.Context) error {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (input *UpdatePost) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	if user.IsCollaborator() {
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	if user.IsCollaborator(tenant) {
 		return true
 	}
 
@@ -169,6 +170,7 @@ func (action *AddNewComment) Validate(ctx context.Context, user *entity.User) *v
 // SetResponse represents the action to update an post response
 type SetResponse struct {
 	Number         int             `route:"number"`
+	BoardId        int             `route:"board"`
 	Status         enum.PostStatus `json:"status"`
 	Text           string          `json:"text"`
 	OriginalNumber int             `json:"originalNumber"`
@@ -178,7 +180,8 @@ type SetResponse struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *SetResponse) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsCollaborator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsCollaborator(tenant)
 }
 
 // Validate if current model is valid
@@ -222,7 +225,8 @@ type DeletePost struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *DeletePost) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsAdministrator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsAdministrator(tenant)
 }
 
 // Validate if current model is valid
@@ -267,7 +271,8 @@ func (action *EditComment) IsAuthorized(ctx context.Context, user *entity.User) 
 
 	action.Post = postByNumber.Result
 	action.Comment = commentByID.Result
-	return user.ID == action.Comment.User.ID || user.IsCollaborator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user.ID == action.Comment.User.ID || user.IsCollaborator(tenant)
 }
 
 // Validate if current model is valid
@@ -312,7 +317,8 @@ func (action *DeleteComment) IsAuthorized(ctx context.Context, user *entity.User
 		return false
 	}
 
-	return user.ID == commentByID.Result.User.ID || user.IsCollaborator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user.ID == commentByID.Result.User.ID || user.IsCollaborator(tenant)
 }
 
 // Validate if current model is valid

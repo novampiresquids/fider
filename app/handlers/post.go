@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/getfider/fider/app/models/dto"
+	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/bus"
 	"github.com/getfider/fider/app/pkg/csv"
+	"github.com/getfider/fider/app/pkg/log"
 	"github.com/getfider/fider/app/pkg/markdown"
 	"github.com/getfider/fider/app/pkg/web"
 )
@@ -16,6 +19,53 @@ func Index() web.HandlerFunc {
 	return func(c *web.Context) error {
 		c.SetCanonicalURL("")
 
+		/*
+			searchPosts := &query.SearchPosts{
+				Query: c.QueryParam("query"),
+				View:  c.QueryParam("view"),
+				Limit: c.QueryParam("limit"),
+				Tags:  c.QueryParamAsArray("tags"),
+			}
+			getAllTags := &query.GetAllTags{}
+			countPerStatus := &query.CountPostPerStatus{}
+
+			if err := bus.Dispatch(c, searchPosts, getAllTags, countPerStatus); err != nil {
+				return c.Failure(err)
+			}
+
+			description := ""
+			if c.Tenant().WelcomeMessage != "" {
+				description = markdown.PlainText(c.Tenant().WelcomeMessage)
+			} else {
+				description = "We'd love to hear what you're thinking about. What can we do better? This is the place for you to vote, discuss and share posts."
+			}
+		*/
+
+		result := []*entity.Tenant{}
+		userBoards := &query.GetTenantsByUser{
+			Result: result,
+		}
+
+		if err := bus.Dispatch(c, userBoards); err != nil {
+			return c.Failure(err)
+		}
+
+		log.Infof(c, "Number of tenants: @{num}", dto.Props{"num": len(userBoards.Result)})
+
+		description := "Welcome to Fider"
+
+		return c.Page(http.StatusOK, web.Props{
+			Page:        "Home/Home.page",
+			Description: description,
+			Data: web.Map{
+				"boards": userBoards.Result,
+			},
+		})
+	}
+}
+
+func BoardDetails() web.HandlerFunc {
+	return func(c *web.Context) error {
 		searchPosts := &query.SearchPosts{
 			Query: c.QueryParam("query"),
 			View:  c.QueryParam("view"),
@@ -35,14 +85,14 @@ func Index() web.HandlerFunc {
 		} else {
 			description = "We'd love to hear what you're thinking about. What can we do better? This is the place for you to vote, discuss and share posts."
 		}
-
 		return c.Page(http.StatusOK, web.Props{
-			Page:        "Home/Home.page",
+			Page:        "Board/Board.page",
 			Description: description,
 			Data: web.Map{
 				"posts":          searchPosts.Result,
 				"tags":           getAllTags.Result,
 				"countPerStatus": countPerStatus.Result,
+				"boardNumber":    c.Tenant().ID,
 			},
 		})
 	}
@@ -62,7 +112,7 @@ func PostDetails() web.HandlerFunc {
 		}
 
 		if c.Param("slug") != getPost.Result.Slug {
-			return c.Redirect(fmt.Sprintf("/posts/%d/%s", getPost.Result.Number, getPost.Result.Slug))
+			return c.Redirect(fmt.Sprintf("/board/%d/posts/%d/%s", c.Tenant().ID, getPost.Result.Number, getPost.Result.Slug))
 		}
 
 		isSubscribed := &query.UserSubscribedTo{PostID: getPost.Result.ID}
@@ -85,6 +135,7 @@ func PostDetails() web.HandlerFunc {
 				"tags":        getAllTags.Result,
 				"votes":       listVotes.Result,
 				"attachments": getAttachments.Result,
+				"boardNumber": c.Tenant().ID,
 			},
 		})
 	}

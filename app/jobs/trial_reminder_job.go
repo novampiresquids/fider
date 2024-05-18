@@ -39,7 +39,7 @@ func (e TrialReminderJobHandler) Run(ctx Context) error {
 	to := make([]dto.Recipient, 0)
 	for _, contact := range q.Contacts {
 		to = append(to, dto.NewRecipient(contact.Name, contact.Email, dto.Props{
-			"url":  fmt.Sprintf("https://%s.%s", contact.Tenant.Subdomain, env.Config.HostDomain),
+			"url":  fmt.Sprintf("https://%s", env.Config.HostDomain),
 			"name": contact.Name,
 		}))
 	}

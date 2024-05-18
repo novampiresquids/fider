@@ -94,24 +94,28 @@ func getCommentByID(ctx context.Context, q *query.GetCommentByID) error {
 							u.id AS user_id, 
 							u.name AS user_name,
 							u.email AS user_email,
-							u.role AS user_role, 
+							m.role AS user_role, 
 							u.status AS user_status,
 							u.avatar_type AS user_avatar_type,
 							u.avatar_bkey AS user_avatar_bkey, 
 							e.id AS edited_by_id, 
 							e.name AS edited_by_name,
 							e.email AS edited_by_email,
-							e.role AS edited_by_role,
+							em.role AS edited_by_role,
 							e.status AS edited_by_status,
 							e.avatar_type AS edited_by_avatar_type,
 							e.avatar_bkey AS edited_by_avatar_bkey
 			FROM comments c
 			INNER JOIN users u
 			ON u.id = c.user_id
-			AND u.tenant_id = c.tenant_id
+			LEFT JOIN members m
+			ON u.id = m.user_id
+			AND m.tenant_id = c.tenant_id
 			LEFT JOIN users e
 			ON e.id = c.edited_by_id
-			AND e.tenant_id = c.tenant_id
+			LEFT JOIN members em
+			ON e.id = em.user_id
+			AND c.tenant_id = em.tenant_id
 			WHERE c.id = $1
 			AND c.tenant_id = $2
 			AND c.deleted_at IS NULL`, q.CommentID, tenant.ID)
@@ -152,14 +156,14 @@ func getCommentsByPost(ctx context.Context, q *query.GetCommentsByPost) error {
 					u.id AS user_id, 
 					u.name AS user_name,
 					u.email AS user_email,
-					u.role AS user_role, 
+					m.role AS user_role, 
 					u.status AS user_status, 
 					u.avatar_type AS user_avatar_type, 
 					u.avatar_bkey AS user_avatar_bkey, 
 					e.id AS edited_by_id, 
 					e.name AS edited_by_name,
 					e.email AS edited_by_email,
-					e.role AS edited_by_role,
+					em.role AS edited_by_role,
 					e.status AS edited_by_status,
 					e.avatar_type AS edited_by_avatar_type, 
 					e.avatar_bkey AS edited_by_avatar_bkey,
@@ -170,10 +174,13 @@ func getCommentsByPost(ctx context.Context, q *query.GetCommentsByPost) error {
 			AND p.tenant_id = c.tenant_id
 			INNER JOIN users u
 			ON u.id = c.user_id
-			AND u.tenant_id = c.tenant_id
+			LEFT JOIN members m
+			ON m.user_id = u.id
 			LEFT JOIN users e
 			ON e.id = c.edited_by_id
-			AND e.tenant_id = c.tenant_id
+			LEFT JOIN members em
+			ON c.user_id = em.user_id
+			AND c.tenant_id = em.tenant_id
 			LEFT JOIN agg_attachments at
 			ON at.comment_id = c.id
 			WHERE p.id = $1

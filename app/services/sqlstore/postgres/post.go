@@ -131,7 +131,7 @@ var (
 																u.id AS user_id, 
 																u.name AS user_name, 
 																u.email AS user_email,
-																u.role AS user_role,
+																m.role AS user_role,
 																u.status AS user_status,
 																u.avatar_type AS user_avatar_type,
 																u.avatar_bkey AS user_avatar_bkey,
@@ -140,7 +140,7 @@ var (
 																r.id AS response_user_id, 
 																r.name AS response_user_name, 
 																r.email AS response_user_email, 
-																r.role AS response_user_role,
+																m2.role AS response_user_role,
 																r.status AS response_user_status,
 																r.avatar_type AS response_user_avatar_type,
 																r.avatar_bkey AS response_user_avatar_bkey,
@@ -153,10 +153,14 @@ var (
 													FROM posts p
 													INNER JOIN users u
 													ON u.id = p.user_id
-													AND u.tenant_id = $1
+													LEFT JOIN members m
+													ON u.id = m.user_id
+													AND m.tenant_id = $1
 													LEFT JOIN users r
 													ON r.id = p.response_user_id
-													AND r.tenant_id = $1
+													LEFT JOIN members m2
+													ON r.id = m2.user_id
+													AND m.tenant_id = $1
 													LEFT JOIN posts d
 													ON d.id = p.original_id
 													AND d.tenant_id = $1
@@ -329,7 +333,7 @@ func updatePost(ctx context.Context, c *cmd.UpdatePost) error {
 
 func getPostByID(ctx context.Context, q *query.GetPostByID) error {
 	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
-		post, err := querySinglePost(ctx, trx, buildPostQuery(user, "p.tenant_id = $1 AND p.id = $2"), tenant.ID, q.PostID)
+		post, err := querySinglePost(ctx, trx, buildPostQuery(user, tenant, "p.tenant_id = $1 AND p.id = $2"), tenant.ID, q.PostID)
 		if err != nil {
 			return errors.Wrap(err, "failed to get post with id '%d'", q.PostID)
 		}
@@ -340,7 +344,7 @@ func getPostByID(ctx context.Context, q *query.GetPostByID) error {
 
 func getPostBySlug(ctx context.Context, q *query.GetPostBySlug) error {
 	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
-		post, err := querySinglePost(ctx, trx, buildPostQuery(user, "p.tenant_id = $1 AND p.slug = $2"), tenant.ID, q.Slug)
+		post, err := querySinglePost(ctx, trx, buildPostQuery(user, tenant, "p.tenant_id = $1 AND p.slug = $2"), tenant.ID, q.Slug)
 		if err != nil {
 			return errors.Wrap(err, "failed to get post with slug '%s'", q.Slug)
 		}
@@ -351,7 +355,7 @@ func getPostBySlug(ctx context.Context, q *query.GetPostBySlug) error {
 
 func getPostByNumber(ctx context.Context, q *query.GetPostByNumber) error {
 	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
-		post, err := querySinglePost(ctx, trx, buildPostQuery(user, "p.tenant_id = $1 AND p.number = $2"), tenant.ID, q.Number)
+		post, err := querySinglePost(ctx, trx, buildPostQuery(user, tenant, "p.tenant_id = $1 AND p.number = $2"), tenant.ID, q.Number)
 		if err != nil {
 			return errors.Wrap(err, "failed to get post with number '%d'", q.Number)
 		}
@@ -362,7 +366,7 @@ func getPostByNumber(ctx context.Context, q *query.GetPostByNumber) error {
 
 func searchPosts(ctx context.Context, q *query.SearchPosts) error {
 	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
-		innerQuery := buildPostQuery(user, "p.tenant_id = $1 AND p.status = ANY($2)")
+		innerQuery := buildPostQuery(user, tenant, "p.tenant_id = $1 AND p.status = ANY($2)")
 
 		if q.Tags == nil {
 			q.Tags = []string{}
@@ -437,9 +441,9 @@ func querySinglePost(ctx context.Context, trx *dbx.Trx, query string, args ...an
 	return post.toModel(ctx), nil
 }
 
-func buildPostQuery(user *entity.User, filter string) string {
+func buildPostQuery(user *entity.User, board *entity.Tenant, filter string) string {
 	tagCondition := `AND tags.is_public = true`
-	if user != nil && user.IsCollaborator() {
+	if user != nil && user.IsCollaborator(board) {
 		tagCondition = ``
 	}
 	hasVotedSubQuery := "null"

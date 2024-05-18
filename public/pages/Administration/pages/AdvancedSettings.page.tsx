@@ -17,7 +17,7 @@ export default class AdvancedSettingsPage extends AdminBasePage<AdvancedSettings
   public id = "p-admin-advanced"
   public name = "advanced"
   public title = "Advanced"
-  public subtitle = "Manage your site settings"
+  public subtitle = "Manage your board settings"
 
   constructor(props: AdvancedSettingsPageProps) {
     super(props)
@@ -32,7 +32,7 @@ export default class AdvancedSettingsPage extends AdminBasePage<AdvancedSettings
   }
 
   private handleSave = async (): Promise<void> => {
-    const result = await actions.updateTenantAdvancedSettings(this.state.customCSS)
+    const result = await actions.updateTenantAdvancedSettings(this.state.customCSS, Fider.session.tenant.id)
     if (result.ok) {
       location.reload()
     } else {

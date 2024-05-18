@@ -35,14 +35,14 @@ func purgeExpiredNotifications(ctx context.Context, c *cmd.PurgeExpiredNotificat
 }
 
 func markAllNotificationsAsRead(ctx context.Context, c *cmd.MarkAllNotificationsAsRead) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		if user == nil {
 			return nil
 		}
 		_, err := trx.Execute(`
 			UPDATE notifications SET read = true, updated_at = $1
-			WHERE tenant_id = $2 AND user_id = $3 AND read = false
-		`, time.Now(), tenant.ID, user.ID)
+			WHERE user_id = $2 AND read = false
+		`, time.Now(), user.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to mark all notifications as read")
 		}
@@ -51,11 +51,11 @@ func markAllNotificationsAsRead(ctx context.Context, c *cmd.MarkAllNotifications
 }
 
 func countUnreadNotifications(ctx context.Context, q *query.CountUnreadNotifications) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		q.Result = 0
 
 		if user != nil {
-			err := trx.Scalar(&q.Result, "SELECT COUNT(*) FROM notifications WHERE tenant_id = $1 AND user_id = $2 AND read = false", tenant.ID, user.ID)
+			err := trx.Scalar(&q.Result, "SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND read = false", user.ID)
 			if err != nil {
 				return errors.Wrap(err, "failed count total unread notifications")
 			}
@@ -65,15 +65,15 @@ func countUnreadNotifications(ctx context.Context, q *query.CountUnreadNotificat
 }
 
 func markNotificationAsRead(ctx context.Context, c *cmd.MarkNotificationAsRead) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		if user == nil {
 			return nil
 		}
 
 		_, err := trx.Execute(`
 			UPDATE notifications SET read = true, updated_at = $1
-			WHERE id = $2 AND tenant_id = $3 AND user_id = $4 AND read = false
-		`, time.Now(), c.ID, tenant.ID, user.ID)
+			WHERE id = $2 AND user_id = $3 AND read = false
+		`, time.Now(), c.ID, user.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to mark notification as read")
 		}
@@ -82,15 +82,15 @@ func markNotificationAsRead(ctx context.Context, c *cmd.MarkNotificationAsRead) 
 }
 
 func getNotificationByID(ctx context.Context, q *query.GetNotificationByID) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		q.Result = nil
 		notification := &entity.Notification{}
 
 		err := trx.Get(notification, `
 			SELECT id, title, link, read, created_at 
 			FROM notifications
-			WHERE id = $1 AND tenant_id = $2 AND user_id = $3
-		`, q.ID, tenant.ID, user.ID)
+			WHERE id = $1 AND user_id = $2
+		`, q.ID, user.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to get notifications with id '%d'", q.ID)
 		}
@@ -106,9 +106,9 @@ func getActiveNotifications(ctx context.Context, q *query.GetActiveNotifications
 		err := trx.Select(&q.Result, `
 			SELECT id, title, link, read, created_at 
 			FROM notifications 
-			WHERE tenant_id = $1 AND user_id = $2
+			WHERE user_id = $1
 			AND (read = false OR updated_at > CURRENT_DATE - INTERVAL '30 days')
-		`, tenant.ID, user.ID)
+		`, user.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to get active notifications")
 		}
@@ -183,17 +183,18 @@ func getActiveSubscribers(ctx context.Context, q *query.GetActiveSubscribers) er
 		// If the event doesn't require a subscription, notify everyone
 		if len(q.Event.RequiresSubscriptionUserRoles) == 0 {
 			err = trx.Select(&users, fmt.Sprintf(`
-				SELECT DISTINCT u.id, u.name, u.email, u.tenant_id, u.role, u.status
+				SELECT DISTINCT u.id, u.name, u.email, m.role, u.status
 				FROM users u
 				LEFT JOIN user_settings set
 				ON set.user_id = u.id
-				AND set.tenant_id = u.tenant_id
 				AND set.key = $1
-				WHERE u.tenant_id = $2
+				LEFT JOIN members m
+				ON m.user_id = u.id
+				WHERE m.tenant_id = $2
 				AND u.status = $5
 				%s
 				AND (
-					(set.value IS NULL AND u.role = ANY($3))
+					(set.value IS NULL AND m.role = ANY($3))
 					OR CAST(set.value AS integer) & $4 > 0
 				)
 				ORDER by u.id`, supressionCondition),
@@ -206,22 +207,22 @@ func getActiveSubscribers(ctx context.Context, q *query.GetActiveSubscribers) er
 		} else {
 			// If the event requires a subscription, notify only those who subscribed
 			err = trx.Select(&users, fmt.Sprintf(`
-				SELECT DISTINCT u.id, u.name, u.email, u.tenant_id, u.role, u.status
+				SELECT DISTINCT u.id, u.name, u.email, m.role, u.status
 				FROM users u
 				LEFT JOIN post_subscribers sub
 				ON sub.user_id = u.id
 				AND sub.post_id = (SELECT id FROM posts p WHERE p.tenant_id = $4 and p.number = $1 LIMIT 1)
-				AND sub.tenant_id = u.tenant_id
 				LEFT JOIN user_settings set
 				ON set.user_id = u.id
 				AND set.key = $3
-				AND set.tenant_id = u.tenant_id
-				WHERE u.tenant_id = $4
+				LEFT JOIN members m
+				ON m.user_id = u.id
+				WHERE m.tenant_id = $4
 				AND u.status = $8
 				%s
-				AND ( sub.status = $2 OR (sub.status IS NULL AND NOT u.role = ANY($7)) )
+				AND ( sub.status = $2 OR (sub.status IS NULL AND NOT m.role = ANY($7)) )
 				AND (
-					(set.value IS NULL AND u.role = ANY($5))
+					(set.value IS NULL AND m.role = ANY($5))
 					OR CAST(set.value AS integer) & $6 > 0
 				)
 				ORDER by u.id`, supressionCondition),

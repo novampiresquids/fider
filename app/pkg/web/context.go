@@ -589,6 +589,9 @@ func BaseURL(ctx context.Context) string {
 	if env.IsSingleHostMode() {
 		return env.Config.BaseURL
 	}
+	if env.IsMultiBoardMode() {
+		return env.Config.BaseURL
+	}
 
 	request, ok := ctx.Value(app.RequestCtxKey).(Request)
 	if ok {
@@ -603,7 +606,7 @@ func BaseURL(ctx context.Context) string {
 func OAuthBaseURL(ctx context.Context) string {
 	request := ctx.Value(app.RequestCtxKey).(Request)
 
-	if env.IsSingleHostMode() {
+	if env.IsSingleHostMode() || env.IsMultiBoardMode() {
 		return BaseURL(ctx)
 	}
 

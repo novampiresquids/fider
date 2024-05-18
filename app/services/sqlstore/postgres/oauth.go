@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 
-	"github.com/getfider/fider/app"
 	"github.com/getfider/fider/app/models/cmd"
 	"github.com/getfider/fider/app/models/entity"
 
@@ -51,10 +50,7 @@ func (m *dbOAuthConfig) toModel() *entity.OAuthConfig {
 }
 
 func getCustomOAuthConfigByProvider(ctx context.Context, q *query.GetCustomOAuthConfigByProvider) error {
-	return using(ctx, func(trx *dbx.Trx, tenant *entity.Tenant, user *entity.User) error {
-		if tenant == nil {
-			return app.ErrNotFound
-		}
+	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 
 		config := &dbOAuthConfig{}
 		err := trx.Get(config, `
@@ -63,8 +59,8 @@ func getCustomOAuthConfigByProvider(ctx context.Context, q *query.GetCustomOAuth
 					 profile_url, token_url, scope, json_user_id_path,
 					 json_user_name_path, json_user_email_path
 		FROM oauth_providers
-		WHERE tenant_id = $1 AND provider = $2
-		`, tenant.ID, q.Provider)
+		WHERE provider = $1
+		`, q.Provider)
 		if err != nil {
 			return err
 		}

@@ -10,6 +10,7 @@ import { VStack } from "@fider/components/layout"
 
 interface ManageWebhooksPageProps {
   webhooks: Webhook[]
+  boardId: number
 }
 
 const webhookSorter = (w1: Webhook, w2: Webhook) => {
@@ -53,7 +54,7 @@ const ManageWebhooksPage = (props: ManageWebhooksPageProps) => {
   const cancelAdd = () => setIsAdding(false)
 
   const saveNewWebhook = async (data: WebhookData): Promise<Failure | undefined> => {
-    const result = await actions.createWebhook(data)
+    const result = await actions.createWebhook(data, props.boardId)
     if (result.ok) {
       setIsAdding(false)
       setAllWebhooks(allWebhooks.concat({ id: result.data.id, ...data }).sort(webhookSorter))
@@ -76,7 +77,7 @@ const ManageWebhooksPage = (props: ManageWebhooksPageProps) => {
   const handleWebhookEdited = async (data: WebhookData): Promise<Failure | undefined> => {
     const webhook = editing
     if (webhook === undefined) return // impossible
-    const result = await actions.updateWebhook(webhook.id, data)
+    const result = await actions.updateWebhook(webhook.id, data, props.boardId)
     if (result.ok) {
       webhook.name = data.name
       webhook.type = data.type
@@ -102,6 +103,7 @@ const ManageWebhooksPage = (props: ManageWebhooksPageProps) => {
     return allWebhooks.filter(filter).map((w) => {
       return (
         <WebhookListItem
+          boardId={props.boardId}
           key={w.id}
           webhook={w}
           onWebhookDeleted={handleWebhookDeleted}
@@ -113,7 +115,7 @@ const ManageWebhooksPage = (props: ManageWebhooksPageProps) => {
   }
 
   const render = (content: JSX.Element) => (
-    <AdminPageContainer id="p-admin-webhooks" name="webhooks" title="Webhooks" subtitle="Manage your site webhooks">
+    <AdminPageContainer id="p-admin-webhooks" name="webhooks" title="Webhooks" subtitle="Manage your board webhooks">
       {content}
     </AdminPageContainer>
   )

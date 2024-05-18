@@ -13,7 +13,7 @@ import (
 	"github.com/getfider/fider/app/pkg/validate"
 )
 
-//CreateUser is the action to create a new user
+// CreateUser is the action to create a new user
 type CreateUser struct {
 	Name      string `json:"name"`
 	Email     string `json:"email"`
@@ -22,7 +22,8 @@ type CreateUser struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *CreateUser) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsAdministrator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsAdministrator(tenant)
 }
 
 // Validate if current model is valid
@@ -53,7 +54,7 @@ func (action *CreateUser) Validate(ctx context.Context, user *entity.User) *vali
 	return result
 }
 
-//ChangeUserRole is the input model change role of an user
+// ChangeUserRole is the input model change role of an user
 type ChangeUserRole struct {
 	Role   enum.Role `route:"role"`
 	UserID int       `json:"userID"`
@@ -64,7 +65,8 @@ func (action *ChangeUserRole) IsAuthorized(ctx context.Context, user *entity.Use
 	if user == nil {
 		return false
 	}
-	return user.IsAdministrator() && user.ID != action.UserID
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user.IsAdministrator(tenant) && user.ID != action.UserID
 }
 
 // Validate if current model is valid
@@ -86,13 +88,13 @@ func (action *ChangeUserRole) Validate(ctx context.Context, user *entity.User) *
 		} else {
 			return validate.Error(err)
 		}
-	} else if userByID.Result.Tenant.ID != user.Tenant.ID {
-		result.AddFieldFailure("userID", "User not found.")
+		// } else if userByID.Result.Tenant.ID != user.Tenant.ID {
+		// result.AddFieldFailure("userID", "User not found.")
 	}
 	return result
 }
 
-//ChangeUserEmail is the action used to change current user's email
+// ChangeUserEmail is the action used to change current user's email
 type ChangeUserEmail struct {
 	Email           string `json:"email" format:"lower"`
 	VerificationKey string
@@ -143,22 +145,22 @@ func (action *ChangeUserEmail) Validate(ctx context.Context, user *entity.User) 
 	return result
 }
 
-//GetEmail returns the email being verified
+// GetEmail returns the email being verified
 func (action *ChangeUserEmail) GetEmail() string {
 	return action.Email
 }
 
-//GetName returns empty for this kind of process
+// GetName returns empty for this kind of process
 func (action *ChangeUserEmail) GetName() string {
 	return ""
 }
 
-//GetUser returns the current user performing this action
+// GetUser returns the current user performing this action
 func (action *ChangeUserEmail) GetUser() *entity.User {
 	return action.Requestor
 }
 
-//GetKind returns EmailVerificationKindSignIn
+// GetKind returns EmailVerificationKindSignIn
 func (action *ChangeUserEmail) GetKind() enum.EmailVerificationKind {
 	return enum.EmailVerificationKindChangeEmail
 }

@@ -13,6 +13,7 @@ interface TagListItemProps {
   tag: Tag
   onTagEdited: (tag: Tag) => void
   onTagDeleted: (tag: Tag) => void
+  boardId: number
 }
 
 export const TagListItem = (props: TagListItemProps) => {
@@ -25,7 +26,7 @@ export const TagListItem = (props: TagListItemProps) => {
   const resetState = async () => setState("view")
 
   const deleteTag = async () => {
-    const result = await actions.deleteTag(tag.slug)
+    const result = await actions.deleteTag(props.boardId, tag.slug)
     if (result.ok) {
       resetState()
       props.onTagDeleted(tag)
@@ -33,7 +34,7 @@ export const TagListItem = (props: TagListItemProps) => {
   }
 
   const updateTag = async (data: TagFormState): Promise<Failure | undefined> => {
-    const result = await actions.updateTag(tag.slug, data.name, data.color, data.isPublic)
+    const result = await actions.updateTag(props.boardId, tag.slug, data.name, data.color, data.isPublic)
     if (result.ok) {
       tag.name = result.data.name
       tag.slug = result.data.slug

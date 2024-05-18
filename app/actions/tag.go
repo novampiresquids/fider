@@ -28,7 +28,8 @@ type CreateEditTag struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *CreateEditTag) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsAdministrator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsAdministrator(tenant)
 }
 
 // Validate if current model is valid
@@ -78,7 +79,8 @@ type DeleteTag struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *DeleteTag) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsAdministrator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsAdministrator(tenant)
 }
 
 // Validate if current model is valid
@@ -104,7 +106,8 @@ type AssignUnassignTag struct {
 
 // IsAuthorized returns true if current user is authorized to perform this action
 func (action *AssignUnassignTag) IsAuthorized(ctx context.Context, user *entity.User) bool {
-	return user != nil && user.IsCollaborator()
+	tenant, _ := ctx.Value(app.TenantCtxKey).(*entity.Tenant)
+	return user != nil && user.IsCollaborator(tenant)
 }
 
 // Validate if current model is valid

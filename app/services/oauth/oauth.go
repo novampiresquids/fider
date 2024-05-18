@@ -17,6 +17,7 @@ import (
 	"github.com/getfider/fider/app/pkg/env"
 	"github.com/getfider/fider/app/pkg/errors"
 	"github.com/getfider/fider/app/pkg/jsonq"
+	"github.com/getfider/fider/app/pkg/log"
 	"github.com/getfider/fider/app/pkg/validate"
 	"github.com/getfider/fider/app/pkg/web"
 	"golang.org/x/oauth2"
@@ -165,6 +166,7 @@ func getOAuthAuthorizationURL(ctx context.Context, q *query.GetOAuthAuthorizatio
 func getOAuthProfile(ctx context.Context, q *query.GetOAuthProfile) error {
 	config, err := getConfig(ctx, q.Provider)
 	if err != nil {
+		log.Error(ctx, err)
 		return err
 	}
 
@@ -175,12 +177,14 @@ func getOAuthProfile(ctx context.Context, q *query.GetOAuthProfile) error {
 	rawProfile := &query.GetOAuthRawProfile{Provider: q.Provider, Code: q.Code}
 	err = bus.Dispatch(ctx, rawProfile)
 	if err != nil {
+		log.Error(ctx, err)
 		return err
 	}
 
 	parseRawProfile := &cmd.ParseOAuthRawProfile{Provider: q.Provider, Body: rawProfile.Result}
 	err = bus.Dispatch(ctx, parseRawProfile)
 	if err != nil {
+		log.Error(ctx, err)
 		return err
 	}
 

@@ -15,13 +15,13 @@ export const UserMenu = () => {
         </Dropdown.ListItem>
         <Dropdown.Divider />
 
-        {fider.session.user.isCollaborator && (
+        {fider.session.user.isCollaborator && fider.session.tenant && (
           <>
             <div className="p-2 text-medium uppercase">
               <Trans id="menu.administration">Administration</Trans>
             </div>
-            <Dropdown.ListItem href="/admin">
-              <Trans id="menu.sitesettings">Site Settings</Trans>
+            <Dropdown.ListItem href={`/board/${fider.session.tenant.id}/admin`}>
+              <Trans id="menu.sitesettings">Board Settings</Trans>
             </Dropdown.ListItem>
             <Dropdown.Divider />
           </>

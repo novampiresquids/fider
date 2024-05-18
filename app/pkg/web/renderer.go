@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/getfider/fider/app/models/dto"
+	"github.com/microcosm-cc/bluemonday"
 
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/bus"
@@ -129,6 +130,11 @@ func getClientAssets(assets []distAsset) *clientAssets {
 	return clientAssets
 }
 
+func SanitizeCSS(css string) template.CSS {
+	p := bluemonday.UGCPolicy()
+	return template.CSS(p.Sanitize(css))
+}
+
 // Render a template based on parameters
 func (r *Renderer) Render(w io.Writer, statusCode int, props Props, ctx *Context) {
 	var err error
@@ -149,6 +155,7 @@ func (r *Renderer) Render(w io.Writer, statusCode int, props Props, ctx *Context
 	tenantName := "Fider"
 	if tenant != nil {
 		tenantName = tenant.Name
+		public["customcss"] = SanitizeCSS(tenant.CustomCSS)
 	}
 
 	title := tenantName
@@ -221,13 +228,13 @@ func (r *Renderer) Render(w io.Writer, statusCode int, props Props, ctx *Context
 			"id":              u.ID,
 			"name":            u.Name,
 			"email":           u.Email,
-			"role":            u.Role,
+			"role":            u.Role(ctx.Tenant()),
 			"status":          u.Status,
 			"avatarType":      u.AvatarType,
 			"avatarURL":       u.AvatarURL,
 			"avatarBlobKey":   u.AvatarBlobKey,
-			"isAdministrator": u.IsAdministrator(),
-			"isCollaborator":  u.IsCollaborator(),
+			"isAdministrator": u.IsAdministrator(ctx.Tenant()),
+			"isCollaborator":  u.IsCollaborator(ctx.Tenant()),
 		}
 	}
 

@@ -11,6 +11,7 @@ import { t, Trans } from "@lingui/macro"
 interface VotesModalProps {
   isOpen: boolean
   post: Post
+  boardNumber: number
   onClose?: () => void
 }
 
@@ -24,7 +25,7 @@ export const VotesModal: React.FC<VotesModalProps> = (props) => {
 
   useEffect(() => {
     if (props.isOpen) {
-      actions.listVotes(props.post.number).then((response) => {
+      actions.listVotes(props.boardNumber, props.post.number).then((response) => {
         if (response.ok) {
           setAllVotes(response.data)
           setFilteredVotes(response.data)

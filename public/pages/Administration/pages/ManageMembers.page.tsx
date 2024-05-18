@@ -24,6 +24,7 @@ interface UserListItemProps {
 }
 
 const UserListItem = (props: UserListItemProps) => {
+  console.log(props.user)
   const admin = props.user.role === UserRole.Administrator && <span>administrator</span>
   const collaborator = props.user.role === UserRole.Collaborator && <span>collaborator</span>
   const blocked = props.user.status === UserStatus.Blocked && <span className="text-red-700">blocked</span>
@@ -63,7 +64,7 @@ export default class ManageMembersPage extends AdminBasePage<ManageMembersPagePr
   public id = "p-admin-members"
   public name = "members"
   public title = "Members"
-  public subtitle = "Manage your site administrators and collaborators"
+  public subtitle = "Manage your board administrators and collaborators"
 
   constructor(props: ManageMembersPageProps) {
     super(props)
@@ -93,7 +94,7 @@ export default class ManageMembersPage extends AdminBasePage<ManageMembersPagePr
 
   private handleAction = async (actionName: string, user: User) => {
     const changeRole = async (role: UserRole) => {
-      const result = await actions.changeUserRole(user.id, role)
+      const result = await actions.changeUserRole(user.id, role, Fider.session.tenant.id)
       if (result.ok) {
         user.role = role
       }

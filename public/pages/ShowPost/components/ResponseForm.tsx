@@ -10,6 +10,7 @@ import { t, Trans } from "@lingui/macro"
 
 interface ResponseFormProps {
   post: Post
+  boardNumber: number
 }
 
 interface ResponseFormState {
@@ -33,7 +34,7 @@ export class ResponseForm extends React.Component<ResponseFormProps, ResponseFor
   }
 
   private submit = async () => {
-    const result = await actions.respond(this.props.post.number, this.state)
+    const result = await actions.respond(this.props.boardNumber, this.props.post.number, this.state)
     if (result.ok) {
       location.reload()
     } else {
@@ -91,7 +92,7 @@ export class ResponseForm extends React.Component<ResponseFormProps, ResponseFor
             {this.state.status === PostStatus.Duplicate.value ? (
               <>
                 <Field>
-                  <PostSearch exclude={[this.props.post.number]} onChanged={this.setOriginalNumber} />
+                  <PostSearch exclude={[this.props.post.number]} onChanged={this.setOriginalNumber} boardNumber={this.props.boardNumber} />
                 </Field>
                 <DisplayError fields={["originalNumber"]} error={this.state.error} />
                 <span className="text-muted">

@@ -40,18 +40,18 @@ export const SideMenu = (props: SiteMenuProps) => {
   return (
     <div className="js-admin-menu sm:hidden md:hidden lg:block">
       <VStack spacing={0} className="c-side-menu rounded-md shadow">
-        <SideMenuItem name="general" title="General" href="/admin" isActive={activeItem === "general"} />
-        <SideMenuItem name="privacy" title="Privacy" href="/admin/privacy" isActive={activeItem === "privacy"} />
-        <SideMenuItem name="members" title="Members" href="/admin/members" isActive={activeItem === "members"} />
-        <SideMenuItem name="tags" title="Tags" href="/admin/tags" isActive={activeItem === "tags"} />
-        <SideMenuItem name="invitations" title="Invitations" href="/admin/invitations" isActive={activeItem === "invitations"} />
-        <SideMenuItem name="authentication" title="Authentication" href="/admin/authentication" isActive={activeItem === "authentication"} />
-        <SideMenuItem name="advanced" title="Advanced" href="/admin/advanced" isActive={activeItem === "advanced"} />
+        <SideMenuItem name="general" title="General" href={`/board/${fider.session.tenant.id}/admin`} isActive={activeItem === "general"} />
+        <SideMenuItem name="privacy" title="Privacy" href={`/board/${fider.session.tenant.id}/admin/privacy`} isActive={activeItem === "privacy"} />
+        <SideMenuItem name="members" title="Members" href={`/board/${fider.session.tenant.id}/admin/members`} isActive={activeItem === "members"} />
+        <SideMenuItem name="tags" title="Tags" href={`/board/${fider.session.tenant.id}/admin/tags`} isActive={activeItem === "tags"} />
+        <SideMenuItem name="invitations" title="Invitations" href={`/board/${fider.session.tenant.id}/admin/invitations`} isActive={activeItem === "invitations"} />
+        <SideMenuItem name="authentication" title="Authentication" href={`/board/${fider.session.tenant.id}/admin/authentication`} isActive={activeItem === "authentication"} />
+        <SideMenuItem name="advanced" title="Advanced" href={`/board/${fider.session.tenant.id}/admin/advanced`} isActive={activeItem === "advanced"} />
         {fider.session.user.isAdministrator && (
           <>
-            {fider.settings.isBillingEnabled && <SideMenuItem name="billing" title="Billing" href="/admin/billing" isActive={activeItem === "billing"} />}
-            <SideMenuItem name="webhooks" title="Webhooks" href="/admin/webhooks" isActive={activeItem === "webhooks"} />
-            <SideMenuItem name="export" title="Export" href="/admin/export" isActive={activeItem === "export"} />
+            {fider.settings.isBillingEnabled && <SideMenuItem name="billing" title="Billing" href={`/board/${fider.session.tenant.id}/admin/billing`} isActive={activeItem === "billing"} />}
+            <SideMenuItem name="webhooks" title="Webhooks" href={`/board/${fider.session.tenant.id}/admin/webhooks`} isActive={activeItem === "webhooks"} />
+            <SideMenuItem name="export" title="Export" href={`/board/${fider.session.tenant.id}/admin/export`} isActive={activeItem === "export"} />
           </>
         )}
       </VStack>
