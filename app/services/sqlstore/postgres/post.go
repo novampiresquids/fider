@@ -160,7 +160,7 @@ var (
 													ON r.id = p.response_user_id
 													LEFT JOIN members m2
 													ON r.id = m2.user_id
-													AND m.tenant_id = $1
+													AND m2.tenant_id = $1
 													LEFT JOIN posts d
 													ON d.id = p.original_id
 													AND d.tenant_id = $1

@@ -83,11 +83,11 @@ export const SignInControl: React.FunctionComponent<SignInControlProps> = (props
                 }
               />
             </Form>
-            {!fider.session.tenant.isEmailAuthAllowed && (
+            {/* {!fider.session.tenant.isEmailAuthAllowed && (
               <p className="text-red-700 mt-1">
                 <Trans id="signin.message.onlyadmins">Currently only allowed to sign in to an administrator account</Trans>
               </p>
-            )}
+            )} */}
           </div>
         ) : (
           <div>

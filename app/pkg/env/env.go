@@ -89,6 +89,13 @@ type config struct {
 			ClientID string `env:"OAUTH_GITHUB_CLIENTID"`
 			Secret   string `env:"OAUTH_GITHUB_SECRET"`
 		}
+		NoVamps struct {
+			ClientID   string `env:"OAUTH_NOVAMPS_CLIENTID"`
+			Secret     string `env:"OAUTH_NOVAMPS_SECRET"`
+			ProfileURL string `env:"OAUTH_NOVAMPS_PROFILEURL"`
+			AuthURL    string `env:"OAUTH_NOVAMPS_AUTHURL"`
+			TokenURL   string `env:"OAUTH_NOVAMPS_TOKENURL"`
+		}
 	}
 	Email struct {
 		Type      string `env:"EMAIL"` // possible values: smtp, mailgun, awsses

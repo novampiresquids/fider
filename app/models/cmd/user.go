@@ -22,8 +22,9 @@ type DeleteCurrentUser struct {
 }
 
 type ChangeUserRole struct {
-	UserID int
-	Role   enum.Role
+	UserID   int
+	Role     enum.Role
+	TenantId int
 }
 
 type ChangeUserEmail struct {

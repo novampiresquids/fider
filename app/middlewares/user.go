@@ -5,10 +5,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/getfider/fider/app/models/cmd"
 	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/enum"
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/bus"
+	"github.com/getfider/fider/app/pkg/log"
 
 	"github.com/getfider/fider/app/pkg/validate"
 
@@ -103,9 +105,44 @@ func User() web.MiddlewareFunc {
 					return c.Unauthorized()
 				}
 
+				// Determine role of user in the current board
+				if user.BoardRole == 0 && c.Tenant() != nil {
+					for _, r := range user.Membership {
+						if r.Board.ID == c.Tenant().ID {
+							user.BoardRole = r.Role
+						}
+					}
+				}
+
 				c.SetUser(user)
 			}
 
+			return next(c)
+		}
+	}
+}
+
+func AddUserToBoard(role enum.Role) web.MiddlewareFunc {
+
+	return func(next web.HandlerFunc) web.HandlerFunc {
+		return func(c *web.Context) error {
+			user := c.User()
+			if user == nil {
+				return c.HandleValidation(validate.Failed("User can not be set to be a member of this board"))
+			}
+			log.Info(c, "Checking user role")
+			log.Info(c, user.BoardRole.String())
+			if user.BoardRole == 0 {
+				changeRole := &cmd.ChangeUserRole{
+					UserID:   user.ID,
+					Role:     enum.RoleVisitor,
+					TenantId: c.Tenant().ID,
+				}
+				err := bus.Dispatch(c, changeRole)
+				if err != nil {
+					return c.HandleValidation(validate.Failed("Could not add member to board"))
+				}
+			}
 			return next(c)
 		}
 	}

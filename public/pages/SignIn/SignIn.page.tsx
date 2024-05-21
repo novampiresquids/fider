@@ -52,7 +52,7 @@ export const SignInPage = () => {
       </div>
       <div className="text-center w-max-4xl mx-auto mb-4">{fider.session.tenant.isPrivate ? <Private /> : <Locked />}</div>
 
-      <SignInControl onEmailSent={onEmailSent} useEmail={true} redirectTo={fider.settings.baseURL} />
+      <SignInControl onEmailSent={onEmailSent} useEmail={false} redirectTo={fider.settings.baseURL} />
       <LegalNotice />
     </div>
   )

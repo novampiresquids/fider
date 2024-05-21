@@ -5,10 +5,8 @@ import (
 	"time"
 
 	"github.com/getfider/fider/app/pkg/bus"
-	"github.com/getfider/fider/app/pkg/log"
 
 	"github.com/getfider/fider/app/models/cmd"
-	"github.com/getfider/fider/app/models/dto"
 	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/enum"
 	"github.com/getfider/fider/app/models/query"
@@ -233,8 +231,8 @@ func createTenant(ctx context.Context, c *cmd.CreateTenant) error {
 		var id int
 		err := trx.Get(&id,
 			`INSERT INTO tenants (name, subdomain, created_at, cname, invitation, welcome_message, status, is_private, custom_css, logo_bkey, locale, is_email_auth_allowed) 
-			 VALUES ($1, $2, $3, '', '', '', $4, false, '', '', $5, true) 
-			 RETURNING id`, c.Name, c.Subdomain, now, c.Status, env.Config.Locale)
+			 VALUES ($1, $2, $3, '', '', $6, $4, false, '', '', $5, true) 
+			 RETURNING id`, c.Name, c.Subdomain, now, c.Status, env.Config.Locale, c.WelcomeMessage)
 		if err != nil {
 			return err
 		}
@@ -249,9 +247,9 @@ func createTenant(ctx context.Context, c *cmd.CreateTenant) error {
 			}
 		}
 
-		byDomain := &query.GetTenantByDomain{Domain: c.Subdomain}
-		err = bus.Dispatch(ctx, byDomain)
-		c.Result = byDomain.Result
+		byId := &query.GetTenantById{Id: id}
+		err = bus.Dispatch(ctx, byId)
+		c.Result = byId.Result
 		return err
 	})
 }
@@ -311,9 +309,7 @@ func getTenantsByUser(ctx context.Context, q *query.GetTenantsByUser) error {
 		}
 
 		for _, v := range tenants {
-			log.Infof(ctx, "Tenant: @{id}", dto.Props{"id": v.ID})
 			q.Result = append(q.Result, v.toModel())
-			log.Infof(ctx, "Length of q: @{l}", dto.Props{"l": len(q.Result)})
 		}
 		return nil
 	})

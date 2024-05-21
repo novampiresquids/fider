@@ -23,7 +23,7 @@ export const Header = () => {
           <HStack justify="between">
             <a href={fider.session.tenant ? `/board/${fider.session.tenant.id}` : '/'} className="flex flex-x flex-items-center flex--spacing-2 h-8">
               <TenantLogo size={100} />
-              <h1 className="text-title">{fider.session.tenant?.name || "Fider - provided by NoVamps" }</h1>
+              <h1 className="text-title">{fider.session.tenant?.name || "Fider" }</h1>
             </a>
             {fider.session.isAuthenticated && (
               <HStack spacing={2}>

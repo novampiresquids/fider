@@ -106,6 +106,21 @@ var (
 			JSONUserNamePath:  "name, login",
 			JSONUserEmailPath: "email",
 		},
+		{
+			Provider:          app.NoVampsProvider,
+			DisplayName:       "Sign in with No Vampire Squids",
+			ProfileURL:        env.Config.OAuth.NoVamps.ProfileURL,
+			Status:            getProviderStatus(env.Config.OAuth.NoVamps.ClientID),
+			IsTrusted:         true,
+			ClientID:          env.Config.OAuth.NoVamps.ClientID,
+			ClientSecret:      env.Config.OAuth.NoVamps.Secret,
+			Scope:             "id name email",
+			AuthorizeURL:      env.Config.OAuth.NoVamps.AuthURL,
+			TokenURL:          env.Config.OAuth.NoVamps.TokenURL,
+			JSONUserIDPath:    "sub",
+			JSONUserNamePath:  "email",
+			JSONUserEmailPath: "email",
+		},
 	}
 )
 

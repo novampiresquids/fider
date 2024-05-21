@@ -25,6 +25,7 @@ type CreateTenant struct {
 	TenantName      string `json:"tenantName"`
 	LegalAgreement  bool   `json:"legalAgreement"`
 	Subdomain       string `json:"subdomain" format:"lower"`
+	WelcomeMessage  string `json:"welcome"`
 	UserClaims      *jwt.OAuthClaims
 }
 
@@ -53,12 +54,14 @@ func (action *CreateTenant) Validate(ctx context.Context, user *entity.User) *va
 			}
 		}
 	} else {
-		if action.Email == "" {
-			result.AddFieldFailure("email", "Email is required.")
-		} else {
-			messages := validate.Email(ctx, action.Email)
-			result.AddFieldFailure("email", messages...)
-		}
+		/*
+			if action.Email == "" {
+				result.AddFieldFailure("email", "Email is required.")
+			} else {
+				messages := validate.Email(ctx, action.Email)
+				result.AddFieldFailure("email", messages...)
+			}
+		*/
 
 		if action.Name == "" {
 			result.AddFieldFailure("name", "Name is required.")
@@ -68,7 +71,7 @@ func (action *CreateTenant) Validate(ctx context.Context, user *entity.User) *va
 		}
 	}
 
-	if env.IsSingleHostMode() {
+	if env.IsSingleHostMode() || env.IsMultiBoardMode() {
 		action.Subdomain = "default"
 	}
 
@@ -76,12 +79,14 @@ func (action *CreateTenant) Validate(ctx context.Context, user *entity.User) *va
 		result.AddFieldFailure("tenantName", "Name is required.")
 	}
 
-	messages, err := validate.Subdomain(ctx, action.Subdomain)
-	if err != nil {
-		return validate.Error(err)
-	}
+	/*
+		messages, err := validate.Subdomain(ctx, action.Subdomain)
+		if err != nil {
+			return validate.Error(err)
+		}
 
-	result.AddFieldFailure("subdomain", messages...)
+		result.AddFieldFailure("subdomain", messages...)
+	*/
 
 	if env.HasLegal() && !action.LegalAgreement {
 		result.AddFieldFailure("legalAgreement", "You must agree before proceeding.")

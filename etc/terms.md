@@ -1,3 +1,3 @@
 # Terms of Service
 
-THIS IS A PLACEHOLDER FOR TERMS OF SERVICE. REPLACE WITH YOUR OWN.
+By using this app, you agree to use it responsibly and understand that it is experimental in nature. We are not liable for any consequences resulting from your use of the app.

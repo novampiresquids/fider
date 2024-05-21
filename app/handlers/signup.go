@@ -50,21 +50,28 @@ func CreateTenant() web.HandlerFunc {
 		}
 
 		action := actions.NewCreateTenant()
+		action.Email = c.User().Email
+		action.Name = c.User().Name
+		action.LegalAgreement = true
 		if result := c.BindTo(action); !result.Ok {
 			return c.HandleValidation(result)
 		}
 
 		socialSignUp := action.Token != ""
 
-		status := enum.TenantPending
-		if socialSignUp {
-			status = enum.TenantActive
-		}
+		/*
+			status := enum.TenantPending
+			if socialSignUp {
+				status = enum.TenantActive
+			}
+		*/
+		status := enum.TenantActive
 
 		createTenant := &cmd.CreateTenant{
-			Name:      action.TenantName,
-			Subdomain: action.Subdomain,
-			Status:    status,
+			Name:           action.TenantName,
+			Subdomain:      action.Subdomain,
+			Status:         status,
+			WelcomeMessage: action.WelcomeMessage,
 		}
 		err := bus.Dispatch(c, createTenant)
 		if err != nil {
@@ -83,7 +90,7 @@ func CreateTenant() web.HandlerFunc {
 			},
 		}
 
-		siteURL := web.TenantBaseURL(c, c.Tenant())
+		// siteURL := web.TenantBaseURL(c, c.Tenant())
 
 		if socialSignUp {
 			user.Name = action.UserClaims.OAuthName
@@ -118,14 +125,25 @@ func CreateTenant() web.HandlerFunc {
 				return c.Failure(err)
 			}
 
-			c.Enqueue(tasks.SendSignUpEmail(action, siteURL))
+			// c.Enqueue(tasks.SendSignUpEmail(action, siteURL))
+		}
+		changeRole := &cmd.ChangeUserRole{
+			UserID:   c.User().ID,
+			Role:     enum.RoleAdministrator,
+			TenantId: createTenant.Result.ID,
+		}
+		err = bus.Dispatch(c, changeRole)
+		if err != nil {
+			return c.HandleValidation(validate.Failed("Could not add admin to board"))
 		}
 
-		if status == enum.TenantActive && user.Email != "" {
-			c.Enqueue(tasks.SendWelcomeEmail(user.Name, user.Email, siteURL))
-		}
+		// if status == enum.TenantActive && user.Email != "" {
+		// c.Enqueue(tasks.SendWelcomeEmail(user.Name, user.Email, siteURL))
+		// }
 
-		return c.Ok(web.Map{})
+		return c.Ok(web.Map{
+			"id": createTenant.Result.ID,
+		})
 	}
 }
 

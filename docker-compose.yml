@@ -13,7 +13,7 @@ services:
     volumes:
       - pgdev-data:/var/lib/postgresql/data
     ports:
-      - "5555:5432"
+      - "5588:5432"
     environment:
       POSTGRES_USER: fider
       POSTGRES_PASSWORD: fider_pw

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/getfider/fider/app/models/dto"
 	"github.com/getfider/fider/app/models/entity"
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/bus"
@@ -41,6 +40,13 @@ func Index() web.HandlerFunc {
 			}
 		*/
 
+		description := "Welcome to Fider"
+		if c.User() == nil {
+			return c.Page(http.StatusOK, web.Props{
+				Page:        "Home/LoginRequired.page",
+				Description: description,
+			})
+		}
 		result := []*entity.Tenant{}
 		userBoards := &query.GetTenantsByUser{
 			Result: result,
@@ -49,10 +55,6 @@ func Index() web.HandlerFunc {
 		if err := bus.Dispatch(c, userBoards); err != nil {
 			return c.Failure(err)
 		}
-
-		log.Infof(c, "Number of tenants: @{num}", dto.Props{"num": len(userBoards.Result)})
-
-		description := "Welcome to Fider"
 
 		return c.Page(http.StatusOK, web.Props{
 			Page:        "Home/Home.page",
@@ -124,6 +126,7 @@ func PostDetails() web.HandlerFunc {
 			return c.Failure(err)
 		}
 
+		log.Info(c, fmt.Sprintf("Number of comments: %d", len(getComments.Result)))
 		return c.Page(http.StatusOK, web.Props{
 			Page:        "ShowPost/ShowPost.page",
 			Title:       getPost.Result.Title,

@@ -3,10 +3,10 @@ import "./BoardsContainer.scss"
 import React from "react"
 
 import { Board, CurrentUser } from "@fider/models"
-import { Loader, Input } from "@fider/components"
+import { Loader } from "@fider/components"
 import { actions, navigator, querystring } from "@fider/services"
-import IconSearch from "@fider/assets/images/heroicons-search.svg"
-import IconX from "@fider/assets/images/heroicons-x.svg"
+// import IconSearch from "@fider/assets/images/heroicons-search.svg"
+// import IconX from "@fider/assets/images/heroicons-x.svg"
 import { ListBoards } from "./ListBoards"
 import { t, Trans } from "@lingui/macro"
 
@@ -67,13 +67,13 @@ export class BoardsContainer extends React.Component<PostsContainerProps, Boards
     }, 500)
   }
 
-  private handleSearchFilterChanged = (query: string) => {
-    this.changeFilterCriteria({ query }, true)
-  }
+  // private handleSearchFilterChanged = (query: string) => {
+    // this.changeFilterCriteria({ query }, true)
+  // }
 
-  private clearSearch = () => {
-    this.changeFilterCriteria({ query: "" }, true)
-  }
+  // private clearSearch = () => {
+    // this.changeFilterCriteria({ query: "" }, true)
+  // }
 
   private showMore = (event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>): void => {
     event.preventDefault()
@@ -97,20 +97,19 @@ export class BoardsContainer extends React.Component<PostsContainerProps, Boards
             </div>
           )}
           <div className="c-posts-container__search-col">
-            <Input
+            {/* <Input
               field="query"
               icon={this.state.query ? IconX : IconSearch}
               onIconClick={this.state.query ? this.clearSearch : undefined}
               placeholder={t({ id: "home.postscontainer.query.placeholder", message: "Search" })}
               value={this.state.query}
               onChange={this.handleSearchFilterChanged}
-            />
+            /> */}
           </div>
         </div>
-        List of boards
         <ListBoards
           boards={this.state.boards}
-          emptyText={t({ id: "home.postscontainer.label.noresults", message: "No results matched your search, try something different." })}
+          emptyText={t({ id: "home.boardcontainer.label.noresults", message: "You are not a member of any boards yet. After you create a board or make a contribution to an existing board, it will be available here." })}
         />
         {this.state.loading && <Loader />}
         {showMoreLink && (

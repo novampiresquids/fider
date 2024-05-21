@@ -14,6 +14,7 @@ import (
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/dbx"
 	"github.com/getfider/fider/app/pkg/errors"
+	"github.com/getfider/fider/app/pkg/log"
 )
 
 type dbUser struct {
@@ -224,8 +225,13 @@ func userSubscribedTo(ctx context.Context, q *query.UserSubscribedTo) error {
 func changeUserRole(ctx context.Context, c *cmd.ChangeUserRole) error {
 	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
 		// cmd := "UPDATE users SET role = $2 WHERE id = $1"
-		cmd := "UPDATE members SET role = $2 WHERE user_id = $1"
-		_, err := trx.Execute(cmd, c.UserID, c.Role)
+		// cmd := "UPDATE members SET role = $2 WHERE user_id = $1"
+		cmd := `
+			INSERT INTO members (user_id, tenant_id, role)
+			VALUES ($1, $2, $3) ON CONFLICT (user_id, tenant_id) DO UPDATE SET role = $3
+			`
+		log.Info(ctx, fmt.Sprintf("%d, %d, %d", c.UserID, c.TenantId, c.Role))
+		_, err := trx.Execute(cmd, c.UserID, c.TenantId, c.Role)
 		if err != nil {
 			return errors.Wrap(err, "failed to change user's role")
 		}
@@ -296,14 +302,14 @@ func registerUser(ctx context.Context, c *cmd.RegisterUser) error {
 		c.User.Status = enum.UserActive
 		c.User.Email = strings.ToLower(strings.TrimSpace(c.User.Email))
 		if err := trx.Get(&c.User.ID,
-			"INSERT INTO users (name, email, created_at, tenant_id, role, status, avatar_type, avatar_bkey) VALUES ($1, $2, $3, $4, $5, $6, $7, '') RETURNING id",
-			c.User.Name, c.User.Email, now, 0, c.User.Role, enum.UserActive, enum.AvatarTypeGravatar); err != nil {
+			"INSERT INTO users (name, email, created_at, status, avatar_type, avatar_bkey) VALUES ($1, $2, $3, $4, $5, '') RETURNING id",
+			c.User.Name, c.User.Email, now, enum.UserActive, enum.AvatarTypeGravatar); err != nil {
 			return errors.Wrap(err, "failed to register new user")
 		}
 
 		for _, provider := range c.User.Providers {
-			cmd := "INSERT INTO user_providers (tenant_id, user_id, provider, provider_uid, created_at) VALUES ($1, $2, $3, $4, $5)"
-			if _, err := trx.Execute(cmd, 0, c.User.ID, provider.Name, provider.UID, now); err != nil {
+			cmd := "INSERT INTO user_providers (user_id, provider, provider_uid, created_at) VALUES ($1, $2, $3, $4)"
+			if _, err := trx.Execute(cmd, c.User.ID, provider.Name, provider.UID, now); err != nil {
 				return errors.Wrap(err, "failed to add provider to new user")
 			}
 		}
@@ -314,8 +320,8 @@ func registerUser(ctx context.Context, c *cmd.RegisterUser) error {
 
 func registerUserProvider(ctx context.Context, c *cmd.RegisterUserProvider) error {
 	return using(ctx, func(trx *dbx.Trx, _ *entity.Tenant, user *entity.User) error {
-		cmd := "INSERT INTO user_providers (tenant_id, user_id, provider, provider_uid, created_at) VALUES ($1, $2, $3, $4, $5)"
-		_, err := trx.Execute(cmd, 0, c.UserID, c.ProviderName, c.ProviderUID, time.Now())
+		cmd := "INSERT INTO user_providers (user_id, provider, provider_uid, created_at) VALUES ($1, $2, $3, $4)"
+		_, err := trx.Execute(cmd, c.UserID, c.ProviderName, c.ProviderUID, time.Now())
 		if err != nil {
 			return errors.Wrap(err, "failed to add provider '%s:%s' to user with id '%d'", c.ProviderName, c.ProviderUID, c.UserID)
 		}

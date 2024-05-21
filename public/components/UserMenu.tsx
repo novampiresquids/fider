@@ -13,6 +13,9 @@ export const UserMenu = () => {
         <Dropdown.ListItem href="/settings">
           <Trans id="menu.mysettings">My Settings</Trans>
         </Dropdown.ListItem>
+        <Dropdown.ListItem href="/">
+          <Trans id="menu.myboards">My Boards</Trans>
+        </Dropdown.ListItem>
         <Dropdown.Divider />
 
         {fider.session.user.isCollaborator && fider.session.tenant && (

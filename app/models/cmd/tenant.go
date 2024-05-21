@@ -9,9 +9,10 @@ import (
 )
 
 type CreateTenant struct {
-	Name      string
-	Subdomain string
-	Status    enum.TenantStatus
+	Name           string
+	Subdomain      string
+	Status         enum.TenantStatus
+	WelcomeMessage string
 
 	Result *entity.Tenant
 }

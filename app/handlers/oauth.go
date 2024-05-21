@@ -105,7 +105,7 @@ func OAuthToken() web.HandlerFunc {
 		if err != nil {
 			if errors.Cause(err) == app.ErrNotFound {
 				isTrusted := isTrustedOAuthProvider(c, provider)
-				if c.Tenant().IsPrivate && !isTrusted {
+				if c.Tenant() != nil && c.Tenant().IsPrivate && !isTrusted {
 					return c.Redirect("/not-invited")
 				}
 

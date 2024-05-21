@@ -125,13 +125,15 @@ func routes(r *web.Engine) *web.Engine {
 		// This is meant to be removed when all pages are translated.
 		ui.Use(middlewares.SetLocale("en"))
 
+		ui.Post("/api/v1/board", handlers.CreateTenant())
+
 		ui.Get("/board/:board/admin", handlers.GeneralSettingsPage())
 		ui.Get("/board/:board/admin/advanced", handlers.AdvancedSettingsPage())
 		ui.Get("/board/:board/admin/privacy", handlers.Page("Privacy · Site Settings", "", "Administration/pages/PrivacySettings.page"))
 		ui.Get("/board/:board/admin/invitations", handlers.Page("Invitations · Site Settings", "", "Administration/pages/Invitations.page"))
 		ui.Get("/board/:board/admin/members", handlers.ManageMembers())
 		ui.Get("/board/:board/admin/tags", handlers.ManageTags())
-		ui.Get("/board/:board/admin/authentication", handlers.ManageAuthentication())
+		// ui.Get("/board/:board/admin/authentication", handlers.ManageAuthentication())
 		ui.Get("/_api/admin/oauth/:provider", handlers.GetOAuthConfig())
 
 		//From this step, only Administrators are allowed
@@ -190,6 +192,7 @@ func routes(r *web.Engine) *web.Engine {
 	membersApi := r.Group()
 	{
 		membersApi.Use(middlewares.IsAuthenticated())
+		membersApi.Use(middlewares.AddUserToBoard(enum.RoleVisitor))
 		membersApi.Use(middlewares.BlockLockedTenants())
 
 		membersApi.Post("/api/v1/board/:board/posts", apiv1.CreatePost())

@@ -176,6 +176,7 @@ func getCommentsByPost(ctx context.Context, q *query.GetCommentsByPost) error {
 			ON u.id = c.user_id
 			LEFT JOIN members m
 			ON m.user_id = u.id
+			AND m.tenant_id = p.tenant_id
 			LEFT JOIN users e
 			ON e.id = c.edited_by_id
 			LEFT JOIN members em

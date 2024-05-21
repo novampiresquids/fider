@@ -8,7 +8,7 @@ var ErrNotFound = errors.New("Object not found")
 // InvitePlaceholder represents the placeholder used by members to invite other users
 var InvitePlaceholder = "%invite%"
 
-//ErrUserIDRequired is used when OAuth integration returns an empty user ID
+// ErrUserIDRequired is used when OAuth integration returns an empty user ID
 var ErrUserIDRequired = errors.New("UserID is required during OAuth integration")
 
 type key string
@@ -24,6 +24,8 @@ const (
 	GoogleProvider = "google"
 	//GitHubProvider is const for 'github'
 	GitHubProvider = "github"
+	//NoVampsProvider is const for 'novamps'
+	NoVampsProvider = "novamps"
 )
 
 var (
