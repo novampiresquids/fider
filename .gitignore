@@ -21,3 +21,5 @@ debug.test
 cover.out
 coverage.tmp
 tsconfig.tsbuildinfo
+.env.*
+docker-compose-production.yml

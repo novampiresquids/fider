@@ -53,7 +53,7 @@ export default class ManageAuthenticationPage extends AdminBasePage<ManageAuthen
 
   private startTest = async (provider: string) => {
     const redirect = `${Fider.settings.baseURL}/oauth/${provider}/echo`
-    window.open(`/oauth/${provider}?redirect=${redirect}`, "oauth-test", "width=1100,height=600,status=no,menubar=no")
+    window.open(`${Fider.settings.baseURL}/oauth/${provider}?redirect=${redirect}`, "oauth-test", "width=1100,height=600,status=no,menubar=no")
   }
 
   private cancel = async () => {

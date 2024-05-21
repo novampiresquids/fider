@@ -499,6 +499,9 @@ func (c *Context) NoContent(code int) error {
 // Redirect the request to a provided URL
 func (c *Context) Redirect(url string) error {
 	c.Response.Header().Set("Cache-Control", "no-cache, no-store")
+	if len(url) > 1 && string(url[0]) == "/" {
+		url = c.BaseURL() + url
+	}
 	c.Response.Header().Set("Location", url)
 	c.Response.WriteHeader(http.StatusTemporaryRedirect)
 	return nil
