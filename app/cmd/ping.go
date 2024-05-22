@@ -8,8 +8,8 @@ import (
 	"github.com/getfider/fider/app/pkg/env"
 )
 
-//RunPing checks if Fider Server is running and is healthy
-//Returns an exitcode, 0 for OK and 1 for ERROR
+// RunPing checks if Fider Server is running and is healthy
+// Returns an exitcode, 0 for OK and 1 for ERROR
 func RunPing() int {
 
 	client := &http.Client{}
@@ -23,7 +23,7 @@ func RunPing() int {
 		protocol = "https://"
 	}
 
-	req, err := http.NewRequest("GET", protocol+host+"/_health", nil)
+	req, err := http.NewRequest("GET", protocol+host+"/fider/_health", nil)
 	if err != nil {
 		fmt.Printf("Setting up request failed with: %s", err)
 		return 1
