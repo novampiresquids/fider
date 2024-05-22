@@ -13,7 +13,7 @@ const ListBoardItem = (props: { board: Board; user?: CurrentUser; }) => {
     <HStack center={true}>
       <VStack className="w-full" spacing={2}>
         <HStack justify="between">
-          <a className="text-title hover:text-primary-base" href={`/board/${props.board.id}`}>
+          <a className="text-title hover:text-primary-base" href={`/fider/board/${props.board.id}`}>
             {props.board.name}
           </a>
         </HStack>

@@ -10,10 +10,10 @@ export const UserMenu = () => {
     <div className="c-menu-user">
       <Dropdown position="left" renderHandle={<Avatar user={fider.session.user} />}>
         <div className="p-2 text-medium uppercase">{fider.session.user.name}</div>
-        <Dropdown.ListItem href="/settings">
+        <Dropdown.ListItem href="/fider/settings">
           <Trans id="menu.mysettings">My Settings</Trans>
         </Dropdown.ListItem>
-        <Dropdown.ListItem href="/">
+        <Dropdown.ListItem href="/fider/">
           <Trans id="menu.myboards">My Boards</Trans>
         </Dropdown.ListItem>
         <Dropdown.Divider />
@@ -23,13 +23,13 @@ export const UserMenu = () => {
             <div className="p-2 text-medium uppercase">
               <Trans id="menu.administration">Administration</Trans>
             </div>
-            <Dropdown.ListItem href={`/board/${fider.session.tenant.id}/admin`}>
+            <Dropdown.ListItem href={`/fider/board/${fider.session.tenant.id}/admin`}>
               <Trans id="menu.sitesettings">Board Settings</Trans>
             </Dropdown.ListItem>
             <Dropdown.Divider />
           </>
         )}
-        <Dropdown.ListItem href="/signout?redirect=/">
+        <Dropdown.ListItem href="/fider/signout?redirect=/fider/">
           <Trans id="menu.signout">Sign out</Trans>
         </Dropdown.ListItem>
       </Dropdown>

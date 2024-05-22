@@ -37,7 +37,7 @@ export default class MyNotificationsPage extends React.Component<MyNotifications
     return notifications.map((n) => {
       return (
         <div key={n.id}>
-          <a className="text-link block" href={`/notifications/${n.id}`}>
+          <a className="text-link block" href={`/fider/notifications/${n.id}`}>
             <Markdown text={n.title} style="full" />
           </a>
           <span className="text-muted">

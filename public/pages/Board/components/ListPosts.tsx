@@ -19,7 +19,7 @@ const ListPostItem = (props: { boardNumber: number, post: Post; user?: CurrentUs
       </div>
       <VStack className="w-full" spacing={2}>
         <HStack justify="between">
-          <a className="text-title hover:text-primary-base" href={`/board/${props.boardNumber}/posts/${props.post.number}/${props.post.slug}`}>
+          <a className="text-title hover:text-primary-base" href={`/fider/board/${props.boardNumber}/posts/${props.post.number}/${props.post.slug}`}>
             {props.post.title}
           </a>
           {props.post.commentsCount > 0 && (

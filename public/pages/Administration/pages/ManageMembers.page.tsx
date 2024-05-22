@@ -24,7 +24,6 @@ interface UserListItemProps {
 }
 
 const UserListItem = (props: UserListItemProps) => {
-  console.log(props.user)
   const admin = props.user.role === UserRole.Administrator && <span>administrator</span>
   const collaborator = props.user.role === UserRole.Collaborator && <span>collaborator</span>
   const blocked = props.user.status === UserStatus.Blocked && <span className="text-red-700">blocked</span>

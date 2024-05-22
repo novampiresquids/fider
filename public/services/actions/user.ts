@@ -9,19 +9,19 @@ interface UpdateUserSettings {
 }
 
 export const updateUserSettings = async (request: UpdateUserSettings): Promise<Result> => {
-  return await http.post("/_api/user/settings", request)
+  return await http.post("/fider/_api/user/settings", request)
 }
 
 export const changeUserEmail = async (email: string): Promise<Result> => {
-  return await http.post("/_api/user/change-email", {
+  return await http.post("/fider/_api/user/change-email", {
     email,
   })
 }
 
 export const deleteCurrentAccount = async (): Promise<Result> => {
-  return await http.delete("/_api/user")
+  return await http.delete("/fider/_api/user")
 }
 
 export const regenerateAPIKey = async (): Promise<Result<{ apiKey: string }>> => {
-  return await http.post<{ apiKey: string }>("/_api/user/regenerate-apikey")
+  return await http.post<{ apiKey: string }>("/fider/_api/user/regenerate-apikey")
 }

@@ -62,7 +62,7 @@ export const PostInput = (props: PostInputProps) => {
       if (result.ok) {
         clearError()
         cache.session.remove(CACHE_TITLE_KEY, CACHE_DESCRIPTION_KEY)
-        location.href = `/board/${props.boardNumber}/posts/${result.data.number}/${result.data.slug}`
+        location.href = `/fider/board/${props.boardNumber}/posts/${result.data.number}/${result.data.slug}`
         event.preventEnable()
       } else if (result.error) {
         setError(result.error)

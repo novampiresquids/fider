@@ -12,7 +12,7 @@ export const TermsOfService = () => {
 
   if (fider.settings.hasLegal) {
     return (
-      <a href="/terms" className="text-link" target="_blank">
+      <a href="/fider/terms" className="text-link" target="_blank">
         <Trans id="legal.termsofservice">Terms of Service</Trans>
       </a>
     )
@@ -25,7 +25,7 @@ export const PrivacyPolicy = () => {
 
   if (fider.settings.hasLegal) {
     return (
-      <a href="/privacy" className="text-link" target="_blank">
+      <a href="/fider/privacy" className="text-link" target="_blank">
         <Trans id="legal.privacypolicy">Privacy Policy</Trans>
       </a>
     )

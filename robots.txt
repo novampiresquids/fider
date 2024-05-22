@@ -1,6 +1,6 @@
 User-agent: *
 Disallow: /_api/
-Disallow: /api/v1/
+Disallow: /fider/api/v1/
 Disallow: /admin/
 Disallow: /oauth/
 Disallow: /terms

@@ -185,7 +185,7 @@ func OAuthCallback() web.HandlerFunc {
 		}
 
 		//Test OAuth
-		if redirectURL.Path == fmt.Sprintf("/oauth/%s/echo", provider) {
+		if redirectURL.Path == fmt.Sprintf("/fider/oauth/%s/echo", provider) {
 			var query = redirectURL.Query()
 			query.Set("code", code)
 			query.Set("identifier", parts[1])
@@ -227,7 +227,7 @@ func OAuthCallback() web.HandlerFunc {
 		query.Set("redirect", redirectURL.RequestURI())
 		query.Set("identifier", parts[1])
 		redirectURL.RawQuery = query.Encode()
-		redirectURL.Path = fmt.Sprintf("/oauth/%s/token", provider)
+		redirectURL.Path = fmt.Sprintf("/fider/oauth/%s/token", provider)
 		return c.Redirect(redirectURL.String())
 	}
 }
@@ -250,7 +250,7 @@ func SignInByOAuth() web.HandlerFunc {
 		redirectURL, _ := url.ParseRequestURI(redirect)
 		redirectURL.ResolveReference(c.Request.URL)
 
-		if c.IsAuthenticated() && redirectURL.Path != fmt.Sprintf("/oauth/%s/echo", provider) {
+		if c.IsAuthenticated() && redirectURL.Path != fmt.Sprintf("/fider/oauth/%s/echo", provider) {
 			return c.Redirect(redirect)
 		}
 

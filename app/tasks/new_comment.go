@@ -28,7 +28,7 @@ func NotifyAboutNewComment(post *entity.Post, comment string) worker.Task {
 
 		author := c.User()
 		title := fmt.Sprintf("**%s** left a comment on **%s**", author.Name, post.Title)
-		link := fmt.Sprintf("/board/%d/posts/%d/%s", board.ID, post.Number, post.Slug)
+		link := fmt.Sprintf("/fider/board/%d/posts/%d/%s", board.ID, post.Number, post.Slug)
 		for _, user := range users {
 			if user.ID != author.ID {
 				err = bus.Dispatch(c, &cmd.AddNewNotification{

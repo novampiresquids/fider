@@ -110,7 +110,7 @@ describe("<VoteCounter />", () => {
       fireEvent.click(button)
     })
 
-    expect(mock.post).toHaveBeenCalledWith("/api/v1/posts/10/votes")
+    expect(mock.post).toHaveBeenCalledWith("/fider/api/v1/posts/10/votes")
     expect(mock.post).toHaveBeenCalledTimes(1)
     expect(button).toHaveTextContent("6")
   })
@@ -132,7 +132,7 @@ describe("<VoteCounter />", () => {
       fireEvent.click(button)
     })
 
-    expect(mock.delete).toHaveBeenCalledWith("/api/v1/posts/10/votes")
+    expect(mock.delete).toHaveBeenCalledWith("/fider/api/v1/posts/10/votes")
     expect(mock.delete).toHaveBeenCalledTimes(1)
     expect(button).toHaveTextContent("4")
   })

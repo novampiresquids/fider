@@ -28,7 +28,7 @@ func NotifyAboutNewPost(post *entity.Post) worker.Task {
 		board, _ := c.Value(app.TenantCtxKey).(*entity.Tenant)
 		author := c.User()
 		title := fmt.Sprintf("New post: **%s**", post.Title)
-		link := fmt.Sprintf("/board/%d/posts/%d/%s", board.ID, post.Number, post.Slug)
+		link := fmt.Sprintf("/fider/board/%d/posts/%d/%s", board.ID, post.Number, post.Slug)
 		for _, user := range users {
 			if user.ID != author.ID {
 				err = bus.Dispatch(c, &cmd.AddNewNotification{

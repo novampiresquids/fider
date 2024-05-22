@@ -60,9 +60,6 @@ export const BoardInput = (props: BoardInputProps) => {
       const result = await actions.createBoard(title, description)
       if (result.ok) {
         clearError()
-        console.log("Board created")
-        console.log(result)
-        console.log(result.data)
         cache.session.remove(CACHE_TITLE_KEY, CACHE_DESCRIPTION_KEY)
         location.href = `board/${result.data.id}`
         event.preventEnable()

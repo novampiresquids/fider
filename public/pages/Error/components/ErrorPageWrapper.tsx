@@ -25,8 +25,8 @@ export const ErrorPageWrapper = (props: ErrorPageWrapperProps) => {
             <p>
               <Trans id="page.backhome">
                 Take me back to{" "}
-                <a className="text-link" href={fider.settings.baseURL}>
-                  {fider.settings.baseURL}
+                <a className="text-link" href={fider.settings.baseURL+"/fider"}>
+                  {fider.settings.baseURL+"/fider"}
                 </a>{" "}
                 home page.
               </Trans>

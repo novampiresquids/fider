@@ -22,8 +22,8 @@ export const ErrorPage = (props: ErrorPageProps) => {
         {fider.settings && (
           <span>
             Take me back to{" "}
-            <a className="text-link" href={fider.settings.baseURL}>
-              {fider.settings.baseURL}
+            <a className="text-link" href={fider.settings.baseURL+"/fider"}>
+              {fider.settings.baseURL+"/fider"}
             </a>{" "}
             home page.
           </span>
